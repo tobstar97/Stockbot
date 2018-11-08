@@ -34,6 +34,8 @@ public class Onvista {
         doc = Jsoup.connect(url).get();
     }
 
+
+
     public double getKurs(){
 
         //meta property tag auswaehlen, in dem der Aktienkurs steht
@@ -61,10 +63,15 @@ public class Onvista {
 
         Element table = meta.children().get(1);
 
+        Elements tds = table.select("td");
 
-        System.out.println(table);
+
+
+
+        System.out.println(tds.get(0).text());
 
         String content ="1";
+
 
         double r = Double.parseDouble(content);
         return r;
