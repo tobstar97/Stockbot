@@ -11,15 +11,6 @@ import org.jsoup.nodes.Element;
 import java.util.Scanner;
 import  java.sql.*;
 
-//dies ist ein test von andy
-
-//der bullshit geht nicht wie ich will #andy
-
-
-public class andyTest {
-    System.out.println("Andy: Teste GitHub Connection...")
-}
-
 public class Jsoup_Test {
 
     public static void main (String [] args) throws Exception{
