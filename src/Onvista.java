@@ -11,7 +11,6 @@ public class Onvista {
     String aktienname;
     String ISIN;
     String url = "http://www.onvista.de/aktien/bilanz-guv/Wirecard-Aktie-DE0007472060";
-    String strdUrlBilanzGuV = "http://www.onvista.de/aktien/bilanz-guv/";    //+ aktienname mit "-" + "-" + ISIN         Standardurl für bilanz-guv
     Document doc;
 
     Scanner scan;
@@ -26,7 +25,6 @@ public class Onvista {
         System.out.println("Geben sie den Aktiennamen ein");
         aktienname = scan.next();
 
-        //einzufügen: für jedes leerzeichen im aktiennamen ein "-" einfügen
 
         System.out.println("Geben sie die ISIN ein");
         ISIN = scan.next();
