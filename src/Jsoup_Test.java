@@ -75,7 +75,10 @@ public class Jsoup_Test {
         return null;
     }
 
-    public static double Daten_auslesen() throws IOException{
+
+    //Alles in der Onvista Klasse
+
+    /*public static double Daten_auslesen() throws IOException{
         //bisher nur für gewinn
         
         
@@ -112,7 +115,7 @@ public class Jsoup_Test {
         //Suche wirecard Aktie auf onvista.de
         //ISIN-Nummer: wird hinten in der url durchnummeriert (DE...)
 
-
+/*
         url = url + ISIN;
 
         //Jsoup aufruf
@@ -128,7 +131,9 @@ public class Jsoup_Test {
         //System.out.println(content);
         double r = Double.parseDouble(content);
         return r;
-    }
+    }*/
+
+
 
     public static void test_select(Connection conn)throws Exception{
         Statement stmt = conn.createStatement() ;
