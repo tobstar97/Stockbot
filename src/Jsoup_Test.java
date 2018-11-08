@@ -20,9 +20,14 @@ public class Jsoup_Test {
 
         c = getConnection();
         double x;
-        x = Daten_auslesen();
+        Onvista o = new Onvista();
+
+        o.connect();
+        o.getGewinn();
+
+        /*x = Daten_auslesen();
         post(x,"Wirecard","DE0007472060", 747206, 50000.5,200.2);
-        test_select(c);
+        test_select(c);*/
 
     }
 
