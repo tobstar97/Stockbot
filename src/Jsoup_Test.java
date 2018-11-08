@@ -1,7 +1,9 @@
 /**
  * @author Tobias Heiner
  */
-
+//Arbeitsanweisungen
+//@luketheduke mach mal bitte eigene Klassen für die DatenbankConnection und Daten auslesen ( also zb Klassenname: Database und Auslesen) 
+//@andi probier du mal aus wie du des mit den timestamps machen willst
 import java.io.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -71,11 +73,14 @@ public class Jsoup_Test {
     }
 
     public static double Daten_auslesen() throws IOException{
+        //bisher nur für gewinn
+        
+        
         String aktienname;
         String ISIN;
         String url = "FEHLER!!!"; ;
         int pro;
-
+        
         Scanner scan = new Scanner(System.in);
 
 
