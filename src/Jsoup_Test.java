@@ -75,6 +75,9 @@ public class Jsoup_Test {
         return null;
     }
 
+
+    //Alles in der Onvista Klasse
+
     /*public static double Daten_auslesen() throws IOException{
         //bisher nur für gewinn
         
@@ -129,6 +132,8 @@ public class Jsoup_Test {
         double r = Double.parseDouble(content);
         return r;
     }*/
+
+
 
     public static void test_select(Connection conn)throws Exception{
         Statement stmt = conn.createStatement() ;
