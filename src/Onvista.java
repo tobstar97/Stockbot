@@ -36,6 +36,8 @@ public class Onvista {
 
 
 
+    
+
     public double getKurs(){
 
         //meta property tag auswaehlen, in dem der Aktienkurs steht
