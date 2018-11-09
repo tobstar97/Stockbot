@@ -11,7 +11,7 @@ import org.jsoup.nodes.Document;
 //import java.io.IOException;
 //import java.util.Scanner;
 
-public class DbFillerOnvista {
+public class FeederOnvista {
 
     private String url = "https://www.onvista.de";
     //Document... IntelliJ macht bei mir keine Autovervollständigung für Jsoup... Jemand einen Plan warum?
