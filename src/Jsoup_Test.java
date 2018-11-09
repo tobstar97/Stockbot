@@ -9,7 +9,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import java.util.Scanner;
-import  java.sql.*;
+import java.sql.*;
 
 public class Jsoup_Test {
 
