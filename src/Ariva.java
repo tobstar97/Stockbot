@@ -6,17 +6,28 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.Scanner;
 
+/*
+    === === === === === Relevante Infos für Ariva.de === === === === ===
 
+    Eine Liste aller Aktien bekommt man unter https://www.ariva.de/aktien/suche#page=0&year=_year_2017&sort_n=ariva_name&sort_d=asc
+    Dies ist relevant für die Klasse FeederAriva.java, um
+        "&" -> "-"
+        " " -> "_"
+        "-aktie" nach dem aktiennamen in der url
+
+        tbody -> tr -> td -> a href="/aktienname"
+
+ */
 
 public class Ariva {
 
-    String aktienname;
-    String ISIN;
-    String url = "https://www.ariva.de/";
-    String strdUrlBilanzGuV = "http://www.onvista.de/aktien/bilanz-guv/";    //+ aktienname mit "-" + "-" + ISIN         Standardurl für bilanz-guv
-    Document doc;
+    private String aktienname;
+    private String ISIN;
+    private String url = "https://www.ariva.de/";
+    private String strdUrlBilanzGuV = "http://www.onvista.de/aktien/bilanz-guv/";    //+ aktienname mit "-" + "-" + ISIN         Standardurl für bilanz-guv
+    private Document doc;
 
-    Scanner scan;
+    private Scanner scan;
 
     double gewinn;
     double kurs;
