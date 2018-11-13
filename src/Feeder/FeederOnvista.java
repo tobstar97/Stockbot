@@ -1,8 +1,11 @@
-/*
-    @author andygschaider
-    @description: automatisches Abfragen von Aktiennamen von bekannten Indizes von onvista.
-    Klasse Onvista wird dann mit den Aktiennamen gefüttert und zieht die jeweiligen Daten aus dem Netz.
+/**
+ * Automatisches Abfragen von Aktiennamen von bekannten Indizes von onvista.
+ * Klasse Onvista wird dann mit den Aktiennamen gefuettert und zieht die jeweiligen Daten aus dem Netz.
+ *
+ * @author andygschaider
+ * @since poc
  */
+
 
 package Feeder;
 
