@@ -53,8 +53,18 @@ public class Hilfsmethoden {
      * @param text String mit Format Zeit, irgendein Text
      * @return Zeit
      */
-    public static String shortenTime(String text) {
+    public static String shortenTimeAriva(String text) {
         return text.substring(0,8);
+    }
+
+    /**
+     * Kuerzt einen String auf die Zeitinformaiton herunter
+     * @author andygschaider
+     * @param text String mit Format per , Zeit, irgendein Text
+     * @return Zeit
+     */
+    public static String shortenTimeMorningstar(String text) {
+        return text.substring(4,22);
     }
 
     /**

@@ -45,7 +45,12 @@ public class WebsiteTimestamps {
                 break;
             }
             case "morningstar": {
-                //zu ergänzen
+                try {
+                    date = catchLastModifiedDateMorningstar(url);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.err.println("Class: WebsiteTimestamps.java - Method: getLastModifiedDateFromWebpage - case: morningstar - catchLastModifiedDateMorningstar wirf IOException!");
+                }
                 break;
             }
             default: {
@@ -95,7 +100,7 @@ public class WebsiteTimestamps {
             if(time != null) return time.text();
             else {
                 time = doc.select("div[class=\"snapshotInfo right\"]").first();
-                if(time != null) return Hilfsmethoden.shortenTime(time.text());
+                if(time != null) return Hilfsmethoden.shortenTimeAriva(time.text());
                 else {
                     if(url.contains("ariva.de/aktien/indizes")) return "non-existent";
                     else return "ERROR IN catchLastModifiedDateAriva";
@@ -155,6 +160,27 @@ public class WebsiteTimestamps {
         }
         return pass;
         */
+    }
+
+    /**
+     * Bringt das Datum der letzten Modifizierung an der website (morningstar.*) in Erfahrung.
+     * @author andygschaider
+     * @param url gueltige url.
+     * @return Datum als String.
+     * @throws IOException wenn url Mist.
+     */
+    private String catchLastModifiedDateMorningstar(String url) throws IOException {
+
+        //update-time
+        //div[class="qs-marketindex-legend"]
+        //span class="date"
+        //span class="time"
+        //p id="Col0PriceTime" class="priceInformation"
+
+        Document doc = Jsoup.connect(url).get();
+        Element time = doc.select("p[id=\"Col0PriceTime\"]").first();
+        if(time != null) return time.text();
+        return "non-existent";
     }
 
 }
