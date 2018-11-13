@@ -5,6 +5,9 @@
 //@luketheduke mach mal bitte eigene Klassen für die DatenbankConnection und Daten auslesen ( also zb Klassenname: Database und Auslesen) 
 //@andi probier du mal aus wie du des mit den timestamps machen willst
 import java.io.*;
+
+import Hilfsklassen.Hilfsmethoden;
+import Hilfsklassen.WebsiteTimestamps;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,20 +17,44 @@ import java.sql.*;
 public class Jsoup_Test {
 
     public static void main (String [] args) throws Exception{
-        Connection c;
+                                        //Andys Tests
 
-        c = getConnection();
-        double x;
-        Onvista o = new Onvista();
+        /*WebsiteTimestamps w = new WebsiteTimestamps();
+        System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/gex_performance-index/chart"));
+        System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/gex_performance-index/kursliste"));
+        System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/gex_performance-index"));
+        System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/aktien/"));
+        System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/aktien/indizes"));
+        System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/dax-30"));
+        System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/dax-index/news"));
+        System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/dax-index/forum"));
+        System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/zertifikate/"));
+        System.out.println(Hilfsmethoden.getDomainFromUrl("https://www.youtube.com/"));
+        System.out.println(Hilfsmethoden.urlKuerzenBisDomain("https://www.ariva.de/dax-30"));
+*/
 
-        o.connect();
-        o.getGewinn();
+        System.out.println(Hilfsmethoden.replaceSpaceWithHyphen("Dies ist ein Test - - -."));
+
+                                            //Tobstars Tests
+        //Connection c;
+
+        //c = getConnection();
+        //double x;
+        //Onvista o = new Onvista();
+
+        //o.connect();
+        //o.getGewinn();
 
         /*x = Daten_auslesen();
         post(x,"Wirecard","DE0007472060", 747206, 50000.5,200.2);
         test_select(c);*/
 
     }
+
+
+    //=== === === === === === === === === === === === === === === === === === === === === === === === === ===
+    //=== === === === === === === === === === === SQL - Tests === === === === === === === === === === === ===
+    //=== === === === === === === === === === === === === === === === === === === === === === === === === ===
 
 
     public static  void post(double x, String s, String i, int w, double u, double g) throws Exception{
