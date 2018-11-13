@@ -73,7 +73,7 @@ public class WebsiteTimestamps {
         //Zeit auslesen
         Element time = doc.select("time[datetime]").first();
         //Zeit extrahieren
-        return time.attr("datetime");
+        return Hilfsmethoden.formatTimeOnvista(time.attr("datetime"));
         /*
         DEBUG   =   DEBUG   =   DEBUG   =   DEBUG   =   DEBUG   =   DEBUG   =   DEBUG   =   DEBUG   =   DEBUG
             Wirecard-Aktie (GUV)
@@ -91,16 +91,16 @@ public class WebsiteTimestamps {
      * @throws IOException wenn url Mist.
      */
     private String catchLastModifiedDateAriva (String url) throws IOException {
-
+        String pass;
         Document doc = Jsoup.connect(url).get();
         Element time = doc.select("span[class*=time-with-sec-or-date]").first();
-        if(time != null) return time.text();
+        if(time != null) pass = time.text();
         else {
             time = doc.select("span[class=push_time]").first();
-            if(time != null) return time.text();
+            if(time != null) pass = time.text();
             else {
                 time = doc.select("div[class=\"snapshotInfo right\"]").first();
-                if(time != null) return Hilfsmethoden.shortenTimeAriva(time.text());
+                if(time != null) pass = time.text();
                 else {
                     if(url.contains("ariva.de/aktien/indizes")) return "non-existent";
                     else return "ERROR IN catchLastModifiedDateAriva";
@@ -157,9 +157,8 @@ public class WebsiteTimestamps {
                 pass = time.text();
                 break;
             }
-        }
-        return pass;
-        */
+        } */
+        return Hilfsmethoden.formatTimeAriva(Hilfsmethoden.shortenTimeAriva(pass));
     }
 
     /**
@@ -179,7 +178,7 @@ public class WebsiteTimestamps {
 
         Document doc = Jsoup.connect(url).get();
         Element time = doc.select("p[id=\"Col0PriceTime\"]").first();
-        if(time != null) return time.text();
+        if(time != null) return Hilfsmethoden.formatTimeMorningstar(Hilfsmethoden.shortenTimeMorningstar(time.text()));
         return "non-existent";
     }
 

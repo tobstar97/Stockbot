@@ -64,7 +64,7 @@ public class Hilfsmethoden {
      * @return Zeit
      */
     public static String shortenTimeMorningstar(String text) {
-        return text.substring(4,22);
+        return text.substring(4,23);
     }
 
     /**
@@ -83,6 +83,41 @@ public class Hilfsmethoden {
             r = r + c;
         }
         return r;
+    }
+
+    public static String formatTimeOnvista(String s) {
+        String f = "";
+        f = f + s.substring(0,10);
+        f = f + " " + s.substring(11,19);
+        return f;
+    }
+
+    /**
+     * Timestamps auf einheitliches Format bringen
+     * @param s String
+     * @return String
+     */
+    public static String formatTimeAriva(String s) {
+        String f = "";
+        f = f + "3000-01-01 " + s;
+        return f;
+    }
+
+    /**
+     * Timestamps auf einheitliches Format bringen.
+     * @param s String
+     * @return String
+     */
+    public static String formatTimeMorningstar(String s) {
+        String f ="";
+        f = f + s.substring(6,10);
+        f = f + '-';
+        f = f + s.substring(3,5);
+        f = f + '-';
+        f = f + s.substring(0,2);
+        f = f + ' ';
+        f = f + s.substring(11);
+        return f;
     }
 
 }

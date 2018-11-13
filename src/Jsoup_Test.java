@@ -1,9 +1,3 @@
-/**
- * @author Tobias Heiner
- */
-//Arbeitsanweisungen
-//@luketheduke mach mal bitte eigene Klassen für die DatenbankConnection und Daten auslesen ( also zb Klassenname: Database und Auslesen) 
-//@andi probier du mal aus wie du des mit den timestamps machen willst
 import java.io.*;
 
 import Hilfsklassen.Hilfsmethoden;
@@ -14,15 +8,21 @@ import org.jsoup.nodes.Element;
 import java.util.Scanner;
 import java.sql.*;
 
+/**
+ * @author Tobias Heiner
+ */
+//Arbeitsanweisungen
+//@luketheduke mach mal bitte eigene Klassen für die DatenbankConnection und Daten auslesen ( also zb Klassenname: Database und Auslesen)
+//@andi probier du mal aus wie du des mit den timestamps machen willst
 public class Jsoup_Test {
 
     public static void main (String [] args) throws Exception {
 
                                         //Andys Tests
 
-        /*WebsiteTimestamps w = new WebsiteTimestamps();
+        WebsiteTimestamps w = new WebsiteTimestamps();
         System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/gex_performance-index/chart"));
-        System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/gex_performance-index/kursliste"));
+        /*System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/gex_performance-index/kursliste"));
         System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/gex_performance-index"));
         System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/aktien/"));
         System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/aktien/indizes"));
@@ -33,8 +33,10 @@ public class Jsoup_Test {
         System.out.println(Hilfsmethoden.getDomainFromUrl("https://www.youtube.com/"));
         System.out.println(Hilfsmethoden.urlKuerzenBisDomain("https://www.ariva.de/dax-30"));
 */
+        System.out.println(w.getLastModifiedDateFromWebpage("https://www.onvista.de/aktien/Daimler-Aktie-DE0007100000#topFlopAktien"));
+        System.out.println(w.getLastModifiedDateFromWebpage("http://tools.morningstar.de/de/stockreport/default.aspx?SecurityToken=0P00017PWV]3]0]E0WWE$$ALL"));
 
-        System.out.println(Hilfsmethoden.replaceSpaceWithHyphen("Dies ist ein Test - - -."));
+        //System.out.println(Hilfsmethoden.replaceSpaceWithHyphen("Dies ist ein Test - - -."));
 
                                             //Tobstars Tests
         //Connection c;
