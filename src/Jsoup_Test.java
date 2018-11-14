@@ -22,7 +22,6 @@ public class Jsoup_Test {
                                         //Andys Tests
 
         FeederAriva f = new FeederAriva();
-        f.getNames("https://www.ariva.de/aktien/suche#page=132&year=_year_2017&sort_n=ariva_name&sort_d=asc",1);
         //https://www.ariva.de/aktien/suche#page=132&year=_year_2017&sort_n=ariva_name&sort_d=asc
 
         //WebsiteTimestamps w = new WebsiteTimestamps();
