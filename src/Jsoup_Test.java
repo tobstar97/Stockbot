@@ -1,5 +1,6 @@
 import java.io.*;
 
+import Feeder.FeederAriva;
 import Hilfsklassen.Hilfsmethoden;
 import Hilfsklassen.WebsiteTimestamps;
 import org.jsoup.Jsoup;
@@ -20,8 +21,12 @@ public class Jsoup_Test {
 
                                         //Andys Tests
 
-        WebsiteTimestamps w = new WebsiteTimestamps();
-        System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/gex_performance-index/chart"));
+        FeederAriva f = new FeederAriva();
+        f.getNames("https://www.ariva.de/aktien/suche#page=132&year=_year_2017&sort_n=ariva_name&sort_d=asc",1);
+        //https://www.ariva.de/aktien/suche#page=132&year=_year_2017&sort_n=ariva_name&sort_d=asc
+
+        //WebsiteTimestamps w = new WebsiteTimestamps();
+        //System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/gex_performance-index/chart"));
         /*System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/gex_performance-index/kursliste"));
         System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/gex_performance-index"));
         System.out.println(w.getLastModifiedDateFromWebpage("https://www.ariva.de/aktien/"));
@@ -33,8 +38,8 @@ public class Jsoup_Test {
         System.out.println(Hilfsmethoden.getDomainFromUrl("https://www.youtube.com/"));
         System.out.println(Hilfsmethoden.urlKuerzenBisDomain("https://www.ariva.de/dax-30"));
 */
-        System.out.println(w.getLastModifiedDateFromWebpage("https://www.onvista.de/aktien/Daimler-Aktie-DE0007100000#topFlopAktien"));
-        System.out.println(w.getLastModifiedDateFromWebpage("http://tools.morningstar.de/de/stockreport/default.aspx?SecurityToken=0P00017PWV]3]0]E0WWE$$ALL"));
+        //System.out.println(w.getLastModifiedDateFromWebpage("https://www.onvista.de/aktien/Daimler-Aktie-DE0007100000#topFlopAktien"));
+        //System.out.println(w.getLastModifiedDateFromWebpage("http://tools.morningstar.de/de/stockreport/default.aspx?SecurityToken=0P00017PWV]3]0]E0WWE$$ALL"));
 
         //System.out.println(Hilfsmethoden.replaceSpaceWithHyphen("Dies ist ein Test - - -."));
 
