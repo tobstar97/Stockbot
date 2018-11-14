@@ -1,9 +1,3 @@
-/*
-    @author: andygschaider
-    @description: Alles rund um die (last-modified) timestamps von websites.
-    @version: 2018-11-11
- */
-
 package Hilfsklassen;
 
 import org.jsoup.Jsoup;
@@ -14,10 +8,18 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.Date;
 
+/**
+ * In-Erfahrung-bringen des Datums(+Zeit) der letzten Modifizierung an einer Website.
+ * Alles rund um die (last-modified) timestamps von websites.
+ * @author: andygschaider
+ * @version: 2018-11-11
+ * @since poc
+ */
 public class WebsiteTimestamps {
 
     /**
      * Liefert Datum der letzten Modifizierung einer der folgenden websites: onvista, ariva, morningstar
+     * @author andygschaider
      * @param url gueltige url.
      * @return Datum als String.
      */
@@ -107,57 +109,6 @@ public class WebsiteTimestamps {
                 }
             }
         }
-
-
-        /*
-        if(Hilfsmethoden.istArivaIndex(url) == true) {
-            //System.out.println(">> WebsiteTimestamps.catchLastModifiedDateAriva >> if");
-            Document doc = Jsoup.connect(url).get();
-            Element time = doc.select("span[class*=time-with-sec-or-date]").first();
-            //System.out.println(">> " + time.text());
-            if(time == null) return "BLACK PANTER";
-            return time.text();
-        }
-
-        switch(shorturl) {
-            //für ariva.de/aktien/indizes gibt es keine timestamps
-            case "ariva.de/aktien/indizes": {
-                pass = "non-existent";
-                break;
-            }
-            //für ariva.de/aktien
-            case "ariva.de/aktien": {
-                Document doc = Jsoup.connect(url).get();
-                Element time = doc.select("span[class=push_time]").first();
-                pass = time.text();
-                break;
-            }
-            //ATX: div class="snapshotInfo right"
-            //für die Uebersicht-Seite: div[class="snapshotInfo right"]
-            //ebenso für die Chart-Seite
-
-
-
-            //für !!kurslisten!! von ariva.de/dax-30 oder aequivalente indizes
-            //span class="arp_290@16.4_t_format=time-with-sec-or-date"
-            //span[class^=arp_290@16.4_t_format]
-            case "ariva.de/eurostoxx-50":
-            case "ariva.de/aex":
-            case "ariva.de/atx":
-            case "ariva.de/cac40":
-            case "ariva.de/ibex":
-            case "ariva.de/smi":
-            case "ariva.de/hang-seng":
-            case "ariva.de/nikkei":
-            case "ariva.de/quote/profile.m?secu=674776":
-            case "ariva.de/dow-jones-industrial-average":
-            case "ariva.de/dax-30": {
-                Document doc = Jsoup.connect(url).get();
-                Element time = doc.select("span[class*=time-with-sec-or-date]").first();
-                pass = time.text();
-                break;
-            }
-        } */
         return Hilfsmethoden.formatTimeAriva(Hilfsmethoden.shortenTimeAriva(pass));
     }
 

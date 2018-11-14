@@ -6,6 +6,29 @@ package Hilfsklassen;
  */
 public class Hilfsmethoden {
 
+    /**
+     * Ersetzt alle Leerzeichen mit Bindestrichen
+     * @author andygschaider
+     * @param s String mit Leerzeichen
+     * @return String mit Bindestrich statt Leerzeichen
+     */
+    public static String replaceSpaceWithHyphen (String s) {
+        String r = "";
+        for(int i=0;i<s.length();i++) {
+            char c = s.charAt(i);
+            if(c == ' ') {
+                c = '-';
+            }
+            r = r + c;
+        }
+        return r;
+    }
+
+//    ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+//                                               Timestamp - Formatting
+//    ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
+
+//    === === === ===
 
     /**
      * Extrahiert aus einer url die domain.
@@ -68,23 +91,11 @@ public class Hilfsmethoden {
     }
 
     /**
-     * Ersetzt alle Leerzeichen mit Bindestrichen
-     * @author andygschaider
-     * @param s String mit Leerzeichen
-     * @return String mit Bindestrich statt Leerzeichen
+     * Timestamps der Website OnVista auf einheitliches Format bringen.
+     * @author andgschaider
+     * @param s String
+     * @return String
      */
-    public static String replaceSpaceWithHyphen (String s) {
-        String r = "";
-        for(int i=0;i<s.length();i++) {
-            char c = s.charAt(i);
-            if(c == ' ') {
-                c = '-';
-            }
-            r = r + c;
-        }
-        return r;
-    }
-
     public static String formatTimeOnvista(String s) {
         String f = "";
         f = f + s.substring(0,10);
@@ -93,7 +104,8 @@ public class Hilfsmethoden {
     }
 
     /**
-     * Timestamps auf einheitliches Format bringen
+     * Timestamps der Website Ariva auf einheitliches Format bringen
+     * @author andygschaider
      * @param s String
      * @return String
      */
@@ -104,7 +116,8 @@ public class Hilfsmethoden {
     }
 
     /**
-     * Timestamps auf einheitliches Format bringen.
+     * Timestamps der Website Morningstar auf einheitliches Format bringen.
+     * @author andygschaider
      * @param s String
      * @return String
      */
