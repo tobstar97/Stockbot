@@ -31,7 +31,7 @@ public class FeederAriva {
     private String[] arr = new String[19];
 
     public FeederAriva() {
-        //alle Links zu Aktienindizes die nicht auf das unten gelistete Schema matchen
+        //alle Links zu Aktienindizes die nicht auf das unten in getIndizes() gelistete Schema matchen
         iot.add("https://www.ariva.de/eurostoxx-50");
         iot.add("https://www.ariva.de/aex");
         iot.add("https://www.ariva.de/atx");
@@ -67,6 +67,11 @@ public class FeederAriva {
         }
     }
 
+    /**
+     * Holt die Links zu den Aktienindizes von Ariva.de
+     * @author andygschaider
+     * @throws IOException
+     */
     private void getIndizes() throws IOException {
         String baseurl = "https://www.ariva.de/aktien/indizes";
         Document doc = Jsoup.connect(baseurl).get();
@@ -90,6 +95,12 @@ public class FeederAriva {
         if(debug) System.out.println(set.size());     //550 -> jetzt 800
     }
 
+    /**
+     * Holt die Links zu den Aktien eines Aktienindex von Ariva.de
+     * @author andygschaider
+     * @param res
+     * @throws IOException
+     */
     private void getAndSendNames(String res) throws IOException {
         Document doc = Jsoup.connect(res).get();
         //aus jedem Element den Link rausziehen
@@ -105,6 +116,10 @@ public class FeederAriva {
         //sendNamesToAriva();
     }
 
+    /**
+     * Schickt ein ganzes Set an Links zu Aktien von Ariva.de an Ariva.java
+     * @author andygschaider
+     */
     private void sendNamesToAriva() {
         //Uebermitteln an Klasse Ariva.java
         if(debug) System.out.println("sendNamesToAriva(): " + "! ZU IMPLEMENTIEREN !");
