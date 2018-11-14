@@ -2,6 +2,7 @@ package Hilfsklassen;
 
 /**
  * @author andygschaider
+ * @version poc
  * @since poc
  */
 public class Hilfsmethoden {
@@ -28,7 +29,7 @@ public class Hilfsmethoden {
 //                                               Timestamp - Formatting
 //    ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== =====
 
-//    === === === ===
+//    === === === === === === === === === === = Alles Rund Um Die Domain ==== === === === === === === === === ===
 
     /**
      * Extrahiert aus einer url die domain.
@@ -69,6 +70,8 @@ public class Hilfsmethoden {
         if(url.contains("kursliste")) return true;
         return url.contains("dax");
     }
+
+//    === === === === === === === === === === = Alles Rund Um Die Zeit == === === === === === === === === === ===
 
     /**
      * Kuerzt einen String auf die 8 ersten Chars herunter
