@@ -1,0 +1,38 @@
+Hier werden alle geschriebenen Scripts aufbewahrt, welche uns ggf. jemals noch nützlich sein könnten. #andygschaider
+
+origin: FeederAriva.java
+
+    Elements elems = doc.getElementsByClass("middle");
+    System.out.println(elems);  //liefert 135 Elemente    //sind alles nur Elemente fuer die Suche, nicht die Matches
+
+    //  gibt nur die Sucheinstellungen, nicht die Suchergebnisse
+    Elements elems = doc.getAllElements();
+    for(int i=0;i<elems.size();i++) {
+    Element e = elems.get(i);
+    System.out.println(e.text());
+    }
+
+    //  liefert auch keine Suchergebnisse
+    URL url = new URL(res);
+    BufferedReader r = new BufferedReader(new InputStreamReader( url.openStream()));
+    String line = null;
+    while((line=r.readLine())!=null) System.out.println(line);
+
+origin: FeederAriva.java
+
+1&1 Drillisch
+    //1-1_drillisch-aktie
+    //+ . & wird zu -
+    //() , wird weggeschnitten
+    //leerzeichen wird zu _
+    //-aktie am ende
+
+origin: FeederAriva.java
+
+    //Seite 1 https://www.ariva.de/aktien/suche#page=0  &year=_year_2017&sort_n=ariva_name&sort_d=asc
+    //Seite 2 https://www.ariva.de/aktien/suche#page=1  &year=_year_2017&sort_n=ariva_name&sort_d=asc
+    //S.  133 https://www.ariva.de/aktien/suche#page=132&year=_year_2017&sort_n=ariva_name&sort_d=asc
+    //  funktioniert mit der Such-Seite nicht, da dort nur die Suchoptionen angezeigt werden, nicht die Treffer
+    String url = "https://www.ariva.de/aktien/suche#page=" + i + "&year=_year_2017&sort_n=ariva_name&sort_d=asc";
+    doc = Jsoup.connect(url).get();
+    getNames(url,i);
