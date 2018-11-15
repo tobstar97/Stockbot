@@ -13,7 +13,7 @@ public class Ariva {
     String aktienname;
     String ISIN;
     String url = "https://www.ariva.de/";
-    String strdUrlBilanzGuV = "http://www.onvista.de/aktien/bilanz-guv/";    //+ aktienname mit "-" + "-" + ISIN         Standardurl für bilanz-guv
+    String strdUrlBilanzGuV = "https://www.ariva.de/amazon-aktie/bilanz-guv#stammdaten";    //+ aktienname mit "-" + "-" + ISIN         Standardurl für bilanz-guv
     Document doc;
 
     Scanner scan;
@@ -35,8 +35,8 @@ public class Ariva {
 
         url = url + ISIN;
 
-        doc = Jsoup.connect(url).get();
-
+        //doc = Jsoup.connect(url).get();
+        doc = Jsoup.connect(strdUrlBilanzGuV).get();
         System.out.println("basst");
 
     }
@@ -44,10 +44,41 @@ public class Ariva {
     public double getKurs(){
         Element span = doc.select("span[itemprop=price]").first();
         String content;
+
         content = span.text();
 
 
-        System.out.println(content);
-        return 1.0;
+        //System.out.println(content);
+
+        //System.out.println(convert+"TEST");
+
+        if(content.contains(",")){
+            content = content.replace(",",".");
+        }
+
+        if(content.contains(".")){
+            content = content.replace(".","");
+        }
+        double r = Double.parseDouble(content);
+        r = r/10;
+        //System.out.println(r);
+        return r;
+
+    }
+
+    public double getGewinn(){
+        Element meta = doc.getElementsByClass("subtitle level text-linkblue clickCursor").get(3);
+        Element table = meta.siblingElements().get(4);
+        //Element tb = table.elementSiblingIndex();
+        String content = table.text();
+
+        if(content.contains(".")){
+            content = content.replace(".","");
+        }
+
+        double r = Double.parseDouble(content);
+
+        System.out.println(r);
+        return r;
     }
 }

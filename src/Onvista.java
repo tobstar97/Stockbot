@@ -8,19 +8,18 @@ import java.util.Scanner;
 
 public class Onvista {
 
-    private Document doc;   //Website
+    Document doc;   //Website
 
     //Alle Daten die potenziell aus dem Dokument gezogen werden sollen
-    private String aktienname;
-    private String ISIN;
-    private double gewinn;
-    private double kurs;
+    String aktienname;
+    String ISIN;
+    double gewinn;
+    double kurs;
 
     //Beispiel URL - Wirecard-Aktie
-    private String url = "http://www.onvista.de/aktien/bilanz-guv/Wirecard-Aktie-DE0007472060";
+    String url = "http://www.onvista.de/aktien/bilanz-guv/Wirecard-Aktie-DE0007472060";
     //Standard URLs für die Website onvista, an welche nurnoch die jeweiligen daten gehängt werden
-    private String strdUrlOnvista = "http://www.onvista.de";
-    private String strdUrlBilanzGuV = "http://www.onvista.de/aktien/bilanz-guv/";    //+ aktienname mit "-" + "-" + ISIN         Standardurl für bilanz-guv
+    String strdUrlBilanzGuV = "http://www.onvista.de/aktien/bilanz-guv/";    //+ aktienname mit "-" + "-" + ISIN         Standardurl für bilanz-guv
 
 
 
@@ -45,14 +44,13 @@ public class Onvista {
     public double getKurs(){
 
         //meta property tag auswaehlen, in dem der Aktienkurs steht
-        //CSS Query:    meta[property=schema:price]
-        //Match:        <meta property="schema:price" content="159.05">
         Element meta = doc.select("meta[property=schema:price]").first();
 
         //meta attribut auslesen
         String content = meta.attr("content");
 
-        return Double.parseDouble(content);
+        double r = Double.parseDouble(content);
+        return r;
     }
 
 

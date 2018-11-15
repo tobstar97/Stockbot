@@ -114,7 +114,7 @@ public class Hilfsmethoden {
      */
     public static String formatTimeAriva(String s) {
         String f = "";
-        f = f + "3000-01-01 " + s;
+        f = f + "....-..-.. " + s;
         return f;
     }
 
