@@ -78,33 +78,7 @@ public class Jsoup_Test {
     }
 
 
-    public static Connection getConnection() throws Exception{
-
-        try{
-            String driver = "com.mysql.cj.jdbc.Driver";
-            System.out.println("TEST1");
-            String url = "jdbc:mysql://localhost:3306/Datenbank_Stockbot?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
-            System.out.println("TEST2");
-            String username = "root";
-            String password = "tobstar";
-            System.out.println("Test3");
-            Class.forName(driver);
-
-            Connection conn;
-            conn = DriverManager.getConnection(url, username, password);
-            System.out.println("Connected");
-
-
-            return conn;
-            
-            
-        }catch (Exception e){
-            System.out.println(e);
-        }
-
-        return null;
-    }
-
+   
 
     //Alles in der Onvista Klasse
 
