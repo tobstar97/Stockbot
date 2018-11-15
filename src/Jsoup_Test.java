@@ -6,6 +6,8 @@ import Hilfsklassen.WebsiteTimestamps;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+
+import java.util.Random;
 import java.util.Scanner;
 import java.sql.*;
 
@@ -21,7 +23,7 @@ public class Jsoup_Test {
 
                                         //Andys Tests
 
-        FeederAriva f = new FeederAriva();
+        //FeederAriva f = new FeederAriva();
         //https://www.ariva.de/aktien/suche#page=132&year=_year_2017&sort_n=ariva_name&sort_d=asc
 
         //WebsiteTimestamps w = new WebsiteTimestamps();

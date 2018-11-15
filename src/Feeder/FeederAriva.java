@@ -24,10 +24,10 @@ import org.jsoup.nodes.Element;
 public class FeederAriva {
 
     //debug-Mode on?
-    private boolean debug = false;
+    private boolean debug = true;
 
     private Set<String> set = new HashSet<>(3000);
-    private Set<String> iot = new HashSet<>(20);
+    private Set<String> iot = new HashSet<>(19);
     private String[] arr = new String[19];
 
     public FeederAriva() {
@@ -93,6 +93,8 @@ public class FeederAriva {
 
         if(debug) System.out.println(set);
         if(debug) System.out.println(set.size());     //550 -> jetzt 800
+
+        sendNamesToAriva();
     }
 
     /**
@@ -109,11 +111,10 @@ public class FeederAriva {
             String s = elem.attributes().toString();
             //auf Link kuerzen
             s = s.substring(8);
-            s = s.substring(0,s.length()-1);
+            s = s.substring(0,s.length()-1);    //letztes Zeichen = '>' weg
             if(debug) System.out.println("getAndSendNames():" + s);
             set.add(s);
         }
-        //sendNamesToAriva();
     }
 
     /**
