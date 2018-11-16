@@ -72,15 +72,19 @@ public class FeederAriva {
 
     /**
      * Holt die Links zu den Aktienindizes von Ariva.de
+     *
+     * Beim Erstellen eines Objekts dieser Klasse wird diese Methode einmalig aufgerufen,
+     * danach kann sie von aussen angesteuert und manuell gestartet werden.
+     *
      * @author andygschaider
      * @throws IOException
      */
-    private void getIndizes() throws IOException {
+    public void getIndizes() throws IOException {
         String baseurl = "https://www.ariva.de/aktien/indizes";
         Document doc = Jsoup.connect(baseurl).get();
         for(int i=0; i<doc.select("a[href*=\"dax\"],a[href$=\"-index/kursliste\"],a[href=\"/quote/aktienkurse.m?list=\"],a[href=\"performance_index\"]").size(); i++) {
             //fuer jeden Aktienindex die jeweiligen Aktien raussuchen und dann den Link zur Aktie weiterreichen
-            //matcht:
+            //matcht (liefert ca. 500 Aktienlinks):
                 //alles mit "dax" als bestandteil und
                 //alles mit "-index/kursliste" als ende
             Element elem = doc.select("a[href*=\"dax\"],a[href$=\"-index/kursliste\"],a[href=\"/quote/aktienkurse.m?list=\"],a[href=\"performance_index\"]").get(i);
@@ -88,16 +92,18 @@ public class FeederAriva {
             if(debug) System.out.println("getIndizes(): " + " https://www.ariva.de" + url);
             getAndSendNames("https://www.ariva.de" + url);
         }
-        //jetzt noch alle Indizes, welche nicht auf den select matchen
-        for(int i=0; i<arr.length-1; i++) {
-            if(debug) System.out.println("getIndizes(): " + arr[i]);
-            getAndSendNames("https://www.ariva.de" + arr[i]);
+        System.out.println("=============================================");
+        //jetzt noch alle Indizes, welche nicht auf den select matchen (liefert ca. 300 Aktienlinks)
+        for(int j=0; j<3; j++) {
+            for (int i = 0; i < arr.length - 1; i++) {
+                //if (debug)
+                    System.out.println("getIndizes(): " + arr[i]);
+                getAndSendNames("https://www.ariva.de" + arr[i]);
+            }
         }
 
         if(debug) System.out.println(set);
         if(debug) System.out.println(set.size());     //550 -> jetzt 800
-
-        sendNamesToAriva();
     }
 
     /**
@@ -116,7 +122,10 @@ public class FeederAriva {
             s = s.substring(8);
             s = s.substring(0,s.length()-1);    //letztes Zeichen = '>' weg
             if(debug) System.out.println("getAndSendNames():" + s);
-            set.add(s);
+            if(!set.contains(s)) {
+                sendNameToAriva(s);
+                set.add(s);
+            }
         }
     }
 
@@ -124,7 +133,7 @@ public class FeederAriva {
      * Schickt ein ganzes Set an Links zu Aktien von Ariva.de an Ariva.java
      * @author andygschaider
      */
-    private void sendNamesToAriva() {
+    private void sendNameToAriva(String s) {
         //Uebermitteln an Klasse Ariva.java
         if(debug) System.out.println("sendNamesToAriva(): " + "! ZU IMPLEMENTIEREN !");
 
