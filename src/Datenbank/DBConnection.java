@@ -55,6 +55,7 @@ public class DBConnection {
         }
 
         System.out.println("-=- -=- Unable to connect to Database -=- -=-");
+        System.err.println("-=- -=- Database Connection Failed : DBConnection:setupConnection() -=- -=-");
         return null;
     }
 
