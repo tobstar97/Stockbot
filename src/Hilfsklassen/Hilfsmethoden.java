@@ -79,8 +79,10 @@ public class Hilfsmethoden {
      * @param text String mit Format Zeit, irgendein Text
      * @return Zeit
      */
-    public static String shortenTimeAriva(String text) {
-        return text.substring(0,8);
+    public static String shortenTimeAriva(String text, int i) {
+        //16.11.18 17:35:21 Uhr Xetra | Mehr Kurse »
+        if(i==1) return "20" + text.substring(6,8) + "-" + text.substring(3,5) + "-" + text.substring(0,2) + " " + text.substring(9,17);
+        else return text.substring(0,8);
     }
 
     /**
@@ -112,10 +114,10 @@ public class Hilfsmethoden {
      * @param s String
      * @return String
      */
-    public static String formatTimeAriva(String s) {
-        String f = "";
-        f = f + "....-..-.. " + s;
-        return f;
+    public static String formatTimeAriva(String s, int i) {
+        if(i==1) {return s;}
+
+        return "....-..-.. " + s;
     }
 
     /**

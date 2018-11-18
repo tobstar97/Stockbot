@@ -128,17 +128,18 @@ public class FeederAriva {
             s = s.substring(0,s.length()-1);    //letztes Zeichen = '>' weg
             if(debug) System.out.println("getAndSendNames():" + s);
             if(!set.contains(s)) {
-                sendNameToAriva(s);
+                saveNamesInFile(s);
                 set.add(s);
             }
         }
     }
 
     /**
-     * Schickt ein ganzes Set an Links zu Aktien von Ariva.de an Ariva.java
+     * Speichert alle gefundenen Links in einer Textdatei.
+     * Falls neue Links gefunden werden, werden sie hinzugefuegt.
      * @author andygschaider
      */
-    private void sendNameToAriva(String s) {
+    private void saveNamesInFile(String s) {
         //Uebermitteln an Klasse Ariva.java
         if(debug) System.out.println("sendNamesToAriva(): " + "! ZU IMPLEMENTIEREN !");
 

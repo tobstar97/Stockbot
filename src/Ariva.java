@@ -23,22 +23,28 @@ public class Ariva {
     double gewinn;
     double kurs;
 
+    /**
+     * Resets all parameters in here.
+     */
     public void disconnect() {
         this.ISIN = null;
         this.aktienname = null;
         doc = null;
         this.url = "https://www.ariva.de/";
+        this.gewinn = -1.0;
+        this.kurs = -1.0;
     }
 
     /**
      * Stellt eine Connection zur website her
-     * @param ISIN gueltige ISIN.
+     * @param ISIN_Aktienlink gueltige ISIN oder gueltiger Aktienlink.
      * @throws IOException
      */
-    public void connect(String ISIN) throws IOException {
+    public void connect(String ISIN_Aktienlink) throws IOException {
         this.aktienname = null;
-        this.ISIN = ISIN;
+        this.ISIN = ISIN_Aktienlink;
         url += ISIN;
+        url += "/bilanz-guv";
 
         //doc = Jsoup.connect(url).get();
         doc = Jsoup.connect(url).get();
@@ -56,6 +62,7 @@ public class Ariva {
         this.aktienname = Hilfsmethoden.replaceSpaceWithHyphen(Aktienname);
         this.ISIN = ISIN;
         url += ISIN;
+        url += "/bilanz-guv";
 
         //doc = Jsoup.connect(url).get();
         doc = Jsoup.connect(url).get();
@@ -78,6 +85,7 @@ public class Ariva {
         ISIN = scan.next();
 
         url += ISIN;
+        url += "/bilanz-guv";
 
         //doc = Jsoup.connect(url).get();
         doc = Jsoup.connect(url).get();
