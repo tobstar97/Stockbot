@@ -82,6 +82,9 @@ public class FeederAriva {
     public void getIndizes() throws IOException {
         String baseurl = "https://www.ariva.de/aktien/indizes";
         Document doc = Jsoup.connect(baseurl).get();
+
+        System.out.println("Durchsuche Ariva.de nach gueltigen Aktienlinks. Dies kann einige Minuten dauern...");
+
         for(int i=0; i<doc.select("a[href*=\"dax\"],a[href$=\"-index/kursliste\"],a[href=\"/quote/aktienkurse.m?list=\"],a[href=\"performance_index\"]").size(); i++) {
             //fuer jeden Aktienindex die jeweiligen Aktien raussuchen und dann den Link zur Aktie weiterreichen
             //matcht (liefert ca. 500 Aktienlinks):
@@ -92,18 +95,20 @@ public class FeederAriva {
             if(debug) System.out.println("getIndizes(): " + " https://www.ariva.de" + url);
             getAndSendNames("https://www.ariva.de" + url);
         }
-        System.out.println("=============================================");
+        if(debug) System.out.println("=============================================");
         //jetzt noch alle Indizes, welche nicht auf den select matchen (liefert ca. 300 Aktienlinks)
         for(int j=0; j<3; j++) {
             for (int i = 0; i < arr.length - 1; i++) {
-                //if (debug)
+                if (debug)
                     System.out.println("getIndizes(): " + arr[i]);
                 getAndSendNames("https://www.ariva.de" + arr[i]);
             }
         }
 
-        if(debug) System.out.println(set);
-        if(debug) System.out.println(set.size());     //550 -> jetzt 800
+        //if(debug)
+            System.out.println(set);
+        //if(debug)
+            System.out.println(set.size());     //550 -> jetzt 800
     }
 
     /**
@@ -137,7 +142,7 @@ public class FeederAriva {
         //Uebermitteln an Klasse Ariva.java
         if(debug) System.out.println("sendNamesToAriva(): " + "! ZU IMPLEMENTIEREN !");
 
-        System.out.println(set.size());
+        if(debug) System.out.println(set.size());
 
         //ZU IMPLEMENTIEREN     //ZU IMPLEMENTIEREN     //ZU IMPLEMENTIEREN     //ZU IMPLEMENTIEREN     //ZU IMPLEMENTIEREN
     }

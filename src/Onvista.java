@@ -6,24 +6,33 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.Scanner;
 
+/**
+ * @author Tobias Heiner
+ * @description stellt die verbindung zur website onvista.de her und liefert den aktuellen Kurs und Gewinn
+ */
 public class Onvista {
 
-    Document doc;   //Website
+    private Document doc;   //Website
 
     //Alle Daten die potenziell aus dem Dokument gezogen werden sollen
-    String aktienname;
-    String ISIN;
-    double gewinn;
-    double kurs;
+    private String aktienname;
+    private String ISIN;
+    private double gewinn;
+    private double kurs;
 
     //Beispiel URL - Wirecard-Aktie
-    String url = "http://www.onvista.de/aktien/bilanz-guv/Wirecard-Aktie-DE0007472060";
+    private String url = "http://www.onvista.de/aktien/bilanz-guv/Wirecard-Aktie-DE0007472060"; //TODO
     //Standard URLs für die Website onvista, an welche nurnoch die jeweiligen daten gehängt werden
-    String strdUrlBilanzGuV = "http://www.onvista.de/aktien/bilanz-guv/";    //+ aktienname mit "-" + "-" + ISIN         Standardurl für bilanz-guv
+    private String strdUrlOnvista = "http://www.onvista.de";
+    private String strdUrlBilanzGuV = "http://www.onvista.de/aktien/bilanz-guv/";    //+ aktienname mit "-" + "-" + ISIN         Standardurl für bilanz-guv
 
 
 
-    public void connect() throws IOException {
+    /**
+     * Stellt eine Connection zur website her
+     * @throws IOException
+     */
+    public void connect() throws IOException {      //TODO
         Scanner scan = new Scanner(System.in);  //muss nicht in klasse definiert werden
 
         System.out.println("Geben sie den Aktiennamen ein");
@@ -40,21 +49,27 @@ public class Onvista {
     }
 
 
-
+    /**
+     *Liefert den aktuellen Kurs einer Aktie auf onvista
+     * @return Kurs als double
+     */
     public double getKurs(){
 
         //meta property tag auswaehlen, in dem der Aktienkurs steht
+        //CSS Query:    meta[property=schema:price]
+        //Match:        <meta property="schema:price" content="159.05">
         Element meta = doc.select("meta[property=schema:price]").first();
 
         //meta attribut auslesen
         String content = meta.attr("content");
-
-        double r = Double.parseDouble(content);
-        return r;
+        kurs = Double.parseDouble(content);
+        return kurs;
     }
 
-
-
+    /**
+     * Liefert den aktuellen gewinn eines Unternehmens auf ariva
+     * @return gewinnn als double
+     */
     public double getGewinn(){
 
         //meta property tag auswaehlen, in dem der Gewinn steht
@@ -70,10 +85,8 @@ public class Onvista {
 
         String content ="1";
 
-        double r = Double.parseDouble(content);
-        return r;
+        gewinn = Double.parseDouble(content);
+        return gewinn;
     }
-
-
 
 }
