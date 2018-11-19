@@ -94,6 +94,7 @@ public class WebsiteTimestamps {
      */
     private String catchLastModifiedDateAriva (String url) throws IOException {
         String pass;
+        int i = 0;
         Document doc = Jsoup.connect(url).get();
         Element time = doc.select("span[class*=time-with-sec-or-date]").first();
         if(time != null) pass = time.text();
@@ -102,14 +103,16 @@ public class WebsiteTimestamps {
             if(time != null) pass = time.text();
             else {
                 time = doc.select("div[class=\"snapshotInfo right\"]").first();
-                if(time != null) pass = time.text();
-                else {
+                if(time != null) {
+                    pass = time.text();
+                    i = 1;
+                } else {
                     if(url.contains("ariva.de/aktien/indizes")) return "non-existent";
                     else return "ERROR IN catchLastModifiedDateAriva";
                 }
             }
         }
-        return Hilfsmethoden.formatTimeAriva(Hilfsmethoden.shortenTimeAriva(pass));
+        return Hilfsmethoden.formatTimeAriva(Hilfsmethoden.shortenTimeAriva(pass, i),i);
     }
 
     /**
