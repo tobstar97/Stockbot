@@ -81,8 +81,19 @@ public class Hilfsmethoden {
      */
     public static String shortenTimeAriva(String text, int i) {
         //16.11.18 17:35:21 Uhr Xetra | Mehr Kurse »
-        if(i==1) return "20" + text.substring(6,8) + "-" + text.substring(3,5) + "-" + text.substring(0,2) + " " + text.substring(9,17);
-        else return text.substring(0,8);
+        if(i==1) {
+            if(text.charAt(2) == ':') {
+                if(debug) System.out.println("shortenTimeAriva: int i=" + i + ", String text=" + text + ", String return=" + "1900-01-01 " + text.substring(0,8));
+                return "1900-01-01 " + text.substring(0,8);
+            } else {
+                if(debug) System.out.println("shortenTimeAriva: int i=" + i + ", String text=" + text + ", String return =" + "20" + text.substring(6, 8) + "-" + text.substring(3, 5) + "-" + text.substring(0, 2) + " " + text.substring(9, 17));
+                return "20" + text.substring(6, 8) + "-" + text.substring(3, 5) + "-" + text.substring(0, 2) + " " + text.substring(9, 17);
+            }
+        }
+        else {
+            if(debug) System.out.println("shortenTimeAriva: int i=" + i + ", String text=" + text + ", String return=" + text.substring(0,8));
+            return text.substring(0,8);
+        }
     }
 
     /**
