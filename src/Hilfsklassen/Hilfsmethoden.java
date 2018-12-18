@@ -127,8 +127,8 @@ public class Hilfsmethoden {
      */
     public static String formatTimeAriva(String s, int i) {
         if(i==1) {return s;}
-
-        return "....-..-.. " + s;
+        if(debug) System.out.println("formatTimeAriva: i=" + i + ", String s=" + s);
+        return "1900-01-01 " + s;
     }
 
     /**
