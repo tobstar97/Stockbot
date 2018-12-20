@@ -163,7 +163,7 @@ public class Ariva {
      * https://www.ariva.de/amazon-aktie/kurs immer der 4. eintrag von oben in der tabelle ist der haupthandelsplatz
      * daraus muss die boerse_id ausgelesen werden, z.B. bei Nasdaq 40
      * @param str in Form von "<name>-aktie"
-     * @return
+     * @return Teilstring, "boerse_id=..."
      * @throws IOException
      */
     public String haupthandelsplatz (String str)throws IOException{
@@ -193,16 +193,16 @@ public class Ariva {
 
         //Substring ausgeben
         String temp2 = temp.substring(x+1, y-1);
-        System.out.println(temp2);
+        //System.out.println(temp2);
 
-        return null;
+        return temp2;
     }
 
 
     /**
      * die WKN einer Aktie herausfinden
      * @author Lukas Meinzer
-     * @param str (Aktienname)
+     * @param str (Aktienname) in der Form <name>-aktie
      * @throws UnknownHostException
      * @throws ConnectException
      * @throws NullStringException
@@ -212,32 +212,10 @@ public class Ariva {
         if(str!=null){
 
 
-            //hier irgendwie testen ob der Links mit str+"-aktie" überhaupt existiert,
-            //man könnte ja auch nach der WKN eines Indexes fragen
-            boolean conn = true;
             try{
-                //schauen ob die URL existiert
-                java.net.InetAddress.getByName("https://www.ariva.de/"+str+"-aktie");
-                //conn bleibt true
-            } catch(UnknownHostException e){
-                //wenn nicht wird die Bedingung false gesetzt
-                conn=false;
-            }
-
-
-            if(conn){
-                try{
-                    doc = Jsoup.connect("https://www.ariva.de/"+str+"-aktie").get();
-                } catch (ConnectException e){
-                    System.err.println("Probleme bei der Link-Eingabe.");
-                }
-            }
-            else{
-                try{
-                    doc = Jsoup.connect("https://www.ariva.de/"+str+"-index").get();
-                } catch(ConnectException e){
-                    System.err.println("Connection Probleme");
-                }
+                doc = Jsoup.connect("https://www.ariva.de/"+str).get();
+            } catch (ConnectException e){
+                System.err.println("Probleme bei der Link-Eingabe.");
             }
 
 
