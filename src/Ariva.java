@@ -10,6 +10,8 @@ import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+//TEST EINTRAG
+
 /**
  * @author Tobias Heiner
  * @description stellt die verbindung zur website ariva.de her und liefert den aktuellen Kurs und Gewinn
