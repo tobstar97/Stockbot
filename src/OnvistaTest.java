@@ -11,10 +11,7 @@ import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import java.util.HashSet;
-import java.util.Scanner;
 public class OnvistaTest {
 
     String url = "https://www.onvista.de/aktien/aktien-laender/";
@@ -53,25 +50,58 @@ public class OnvistaTest {
     public void aktienderlaender()throws IOException{
         //System.out.println(arlaender.get(8));
         int siz = arlaender.size();
-        int j = 3;
-        while(j==3){
+        int j = 0;
+        while(j<siz){
             doc = Jsoup.connect(arlaender.get(j)).get();
 
             Element e = doc.getElementsByClass("LETZTER").first();
 
-            if (e == null){
-                int t = doc.select("td.TEXT").size();
-                //System.out.println(t);
-                int i = 0;
-                while(i < t){
-                    Element meta = doc.select("td.TEXT").get(i);
-                    String table = meta.child(0).attr("abs:href");
-                    //System.out.println(table);
-                    araktien.add(table);
-                    i = i+3;
+            //wenn es kein LETZTE Seite Element gibt
+            if (e == null){     //e == null auch wenn es mehrere seiten gibt -> müssen noch alle seiten durchlaufen werden
+                int f = doc.select("div.BLAETTER_NAVI:nth-child(1) > span:nth-child(1)").size();
+                //System.out.println(doc.select("div.BLAETTER_NAVI:nth-child(1) > span:nth-child(1)").text());
+
+
+                String cut = arlaender.get(j);
+                System.out.println(cut);
+                //String temp = e.child(0).attr("abs:href");
+                //temp = temp.replace(cut, "");
+
+                f = f+1;
+
+                int o = 0;
+                while(o<=f){
+                    o++;
+                    cut = cut+o;
+                    o--;
+                    //ab hier könnte man bis zur line 95 eine eigene Methode schreiben und die dann einfach hier aufrufen
+                    int t = doc.select("td.TEXT").size();
+                    //System.out.println(t);
+                    int i = 0;
+                    while(i < t){       //try catch benötigt (wie unten) -- erledigt
+                        try{
+                            doc = Jsoup.connect(cut).get();
+                            Element meta = doc.select("td.TEXT").get(i);
+                            String table = meta.child(0).attr("abs:href");
+                            System.out.println(table);
+                            araktien.add(table);
+                        }catch (Exception ex){
+
+                        }finally {
+                            i = i+3;
+                        }
+
+
+                    }
+
+                    o++;
+                    cut = cut.replace(String.valueOf(o), "");
                 }
 
-            }else{
+
+
+            }else{      //wenn es ein LETZTE Seite Element gibt
+                //sucht sich die letzte Seite, speichert den Wert und läuft dann durch die Seiten durch
                 String cut = arlaender.get(j);
                 //System.out.println(cut);
                 String temp = e.child(0).attr("abs:href");
@@ -84,7 +114,7 @@ public class OnvistaTest {
                     cut = cut+i;
                     //System.out.println(cut);
                     //hier wird dann die seite nach aktien durchlaufen
-
+                    //ab hier könnte man bis zur line 136 eine eigene Methode schreiben und die dann einfach hier aufrufen (siehe Kommentar oben, da diese Teile redundant sind)
                     int t = doc.select("td.TEXT").size();
                     //System.out.println(t);
                     int kl = 0;
@@ -94,7 +124,7 @@ public class OnvistaTest {
                             Element meta = doc.select("td.TEXT").get(kl);
                             //System.out.println();
                             String tab = meta.child(0).attr("abs:href");
-                            //System.out.println(tab);
+                            System.out.println(tab);
                             araktien.add(tab);
                         }catch (Exception ex){
                             //System.out.println(ex);
@@ -123,21 +153,25 @@ public class OnvistaTest {
     public void getISIN()throws IOException{
         int j = araktien.size();
         int i = 0;
-        while(i<j){
+        while(i<j){     //try catch benötigt, da seite eventuell nicht mehr verfügbar -- erledigt
+            try{
+                String temp = araktien.get(i);
+                temp = temp.substring((temp.length()-12));
+                arISIN.add(temp);
+            }catch (Exception ex){
 
-            String temp = araktien.get(i);
-            doc = Jsoup.connect(temp).get();
-            Element e = doc.select(".WERTPAPIER_DETAILS > dl:nth-child(1) > dd:nth-child(4)").first();
+            }finally {
+                i++;
 
-            //System.out.println(e.text());
+            }
 
-            arISIN.add(e.text());
-            i++;
+
         }
     }
 
     public void ausgeben(){
-        System.out.println(arlaender);
+        System.out.println(arISIN.size());
+        System.out.println(arISIN);
     }
 
 
