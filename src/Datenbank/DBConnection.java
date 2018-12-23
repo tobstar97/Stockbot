@@ -1,5 +1,7 @@
 package Datenbank;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
@@ -16,6 +18,18 @@ public class DBConnection {
     String password = "Luke";
 
     public Connection setupConnection() throws Exception {
+        //wird das Programm auf dem Computer von @andygschaider ausgeführt?
+        String hostadr = null;
+        try {
+            hostadr = InetAddress.getLocalHost().toString();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        if(hostadr.contains("Andreas-PC")) {
+            url = "jdbc:mysql://localhost:3306/stockbot?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+            username = "root";
+            password = "admin";
+        }
 
         try {
             String driver = "com.mysql.cj.jdbc.Driver";
