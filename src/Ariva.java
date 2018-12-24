@@ -156,7 +156,7 @@ public class Ariva {
     }
 
 
-    /**
+        /**
      * @author Lukas Meinzer, Tobias Heiner
      * funktioniert!
      * soll den hauphandelsplatz einer aktie rausfinden
@@ -176,33 +176,52 @@ public class Ariva {
 
 
         //Hier testen ob die Aktie überhaupt eingetragene Kurse hat:
-        Element e2 = doc.getElementById("result_table_0").child(2);
-        String temp2 = e2.toString();
+        Element e = doc.getElementById("result_table_0").child(2);
+        String temp = e.toString();
         //System.out.println(temp2);
 
-        if(temp2.contains("keine Kurse vorhanden")){
+        if(temp.contains("keine Kurse vorhanden")){
             return "boerse_id=";
         }
 
 
         //Ab hier der Normalfall/Gutfall
-        Element e = doc.getElementsByClass("ellipsis padding-right-5").get(3);
-        Element meta = e.child(0);
+
+
+        //Hier erstmal rausfinden welches der erste Kurs der Aktie ist, der kein realtime-Kurs ist
+        String text;
+        int count = 0;
+        for(int i=0;i<101000010;i++){
+            Element e2 = doc.getElementsByClass("ellipsis padding-right-5").get(i);
+            text = e2.toString();
+            if(text.contains("mp_realtime")){
+                count++;
+            }
+            else{
+                break;
+            }
+        }
+        //System.out.println(count);
+
+
+
+        Element e3 = doc.getElementsByClass("ellipsis padding-right-5").get(count);
+        Element meta = e3.child(0);
         //System.out.println("Handelsplatz: " +e.text());
 
         //Ab hier etwas unschön programmiert aber funktioniert!
         //meta zu String umwandeln
-        String temp = meta.toString();
+        String temp2 = meta.toString();
         int x=0;
         int y=0;
 
         //meta-String durchlaufen bis man den Anfang von "boerse_id=.." gefunden hat
-        while(temp.charAt(x)!='?'){
+        while(temp2.charAt(x)!='?'){
             x++;
         }
         //und bis man das Ende gefunden hat
         while(y<x){
-            while(temp.charAt(y)!='"'){
+            while(temp2.charAt(y)!='"'){
                 y++;
 
             }
@@ -210,7 +229,7 @@ public class Ariva {
         }
 
         //Substring ausgeben
-        String temp3 = temp.substring(x+1, y-1);
+        String temp3 = temp2.substring(x+1, y-1);
         //System.out.println(temp3);
 
         return temp3;
