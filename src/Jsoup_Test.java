@@ -96,6 +96,39 @@ public class Jsoup_Test {
         System.out.println("main:Morningstar: Gewinn Alphabet Inc: " + morning.getGewinn());
         System.out.println("main:Morningstar: Kurs Alphabet Inc: " + morning.getKurs());
 */
+/*      HOTFIXING der Insert-Kommando-Parameter
+        String umsatzDaten = "-1 -2 -3 -4 -5";
+        for(int i=0;i<5;i++) {
+            String umsatz = "";
+            for (int j = 0; j < umsatzDaten.length(); j++) {
+                if (' ' == (umsatzDaten.charAt(j))) {
+                    umsatz = umsatzDaten.substring(0, j);
+                    umsatzDaten = umsatzDaten.substring(j + 1);
+                    System.out.println("umsatzDaten(" + umsatzDaten + "),umsatz(" + umsatz + ")");
+                    break;
+                }
+            }
+        }
+        System.out.println("=======================");
+        umsatzDaten = "-1 -2 -3 -4 -5";
+        int cnt = 0;
+        for(int i=0;i<5;i++) {
+            String umsatz = "";
+            cnt++;
+            for (int j = 0; j < umsatzDaten.length(); j++) {
+                if (' ' == (umsatzDaten.charAt(j))) {
+                    umsatz = umsatzDaten.substring(0, j);
+                    umsatzDaten = umsatzDaten.substring(j + 1);
+                    System.out.println("umsatzDaten(" + umsatzDaten + "),umsatz(" + umsatz + "),cnt("+cnt+")");
+                    break;
+                }
+            }
+            if(cnt==4) {
+                umsatz = umsatzDaten;
+                System.out.println("umsatzDaten(" + umsatzDaten + "),umsatz(" + umsatz + "),cnt("+cnt+")");
+            }
+        }
+*/
     }
 
 }

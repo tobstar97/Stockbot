@@ -7,9 +7,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 public class FeederOnvistaLowMem {
 
@@ -102,80 +102,108 @@ public class FeederOnvistaLowMem {
         }
     }
 
-    private void getData(String input) throws IOException {
+    private void getData(String input) throws IOException, SQLException {
         String isin = input.substring(input.length()-12);
-        String aname = input.substring(31,input.length()-13);
+        String aname = input.substring(30,input.length()-13);
         String wkn = Jsoup.connect(input).get().select("div[class=\"WERTPAPIER_DETAILS\"]").first().text().substring(4,10);
         if(debug) System.out.println("FeederOnvistaLowMem: getData() > ISIN: " + isin);
         if(debug) System.out.println("FeederOnvistaLowMem: getData() > Aktienname: " + aname);
         if(debug) System.out.println("FeederOnvistaLowMem: getData() > WKN: " + wkn);
 
-        //Fundamentalkennzahlen (Jahresabschluss):
-        String basicLink = "https://www.onvista.de/aktien/fundamental/";
-        String connectToLink = basicLink + aname + "-" + isin;
-        Document doc = Jsoup.connect(connectToLink).get();
-        //Umsatz in Mio. EUR
-            //Jahre
-        Element years = doc.select("th").get(32);
-        Elements yearsTable = years.siblingElements();
-            //Daten
-        Element data = doc.getElementsByClass("INFOTEXT").get(8);
-        Elements dataTable = data.siblingElements();
-        //System.out.println(dataTable);
-/*            //Strings
-        for(int i=0; i<yearsTable.size() && i<dataTable.size(); i++) {
-            String year = yearsTable.get(i).text().replaceAll("&nbsp;","null");
-            String dat = dataTable.get(i).text().replaceAll("&nbsp;","null");
-            dat = dat.replaceAll("e","");
-            year = year.replaceAll("e","");
-            if(debug) System.out.println("FeederOnvistaLowMem: Umsatz: Jahr(" + i + "): " + year);
-            if(debug) System.out.println("FeederOnvistaLowMem: Umsatz: Daten(" + i + "): " + dat);
-            if(!(year == null || year.equals("") || dat == null || dat.equals(""))) {   //nur für vorhandene Werte weiterverarbeiten (Achtung: "-" ist vorhandener Wert, aber ungültig!)
-                //TODO: hier Datenbank-Operationen oder whatever zur Datenweiterverarbeitung!
-                System.out.println("Hier könnte Ihre Werbung stehen (" + i + ")");
-            }
-        }
-*/
-        //Bilanz-GUV
+        //Bilanzdaten
         String guvLink = "https://www.onvista.de/aktien/bilanz-guv/";
         String connGUVLink = guvLink + aname + "-" + isin;
-        doc = Jsoup.connect(connGUVLink).get();
-        //Umsatz in Mio. EUR
-            //Jahre
-        years = doc.select("th").get(26);
-        yearsTable = years.siblingElements();
-            //Daten
-        data = doc.select("tr").get(15);
-        String daten = data.text().substring(19);
+        Document doc = Jsoup.connect(connGUVLink).get();
+        //Jahreszahlen extrahieren                  get(26)
+        Element years = doc.select("th").get(26);
+        Elements yearsTable = years.siblingElements();
+        //Umsatz in Mio. EUR                        get(15)
+        Element umsatzData = doc.select("tr").get(15);
+        String umsatzDaten = umsatzData.text().substring(19);
+        //Eigenkapital                              get(8)
+        Element ekapData = doc.select("tr").get(8);
+        String ekapDaten = ekapData.text().substring(13);
+        //Gesamtkapital (=Bilanzsumme in Mio. EUR)  get(5)
+        Element gkapData = doc.select("tr").get(5);
+        String gkapDaten = gkapData.text().substring(24);
+        //EBIT                                      get(26)
+        Element ebitData = doc.select("tr").get(26);
+        String ebitDaten = ebitData.text().substring(5);
+        //Jahresüberschuss (Gewinn)                 get(24)
+        Element jueData = doc.select("tr").get(24);
+        String jueDaten = jueData.text().substring(17);
             //Strings
         for(int i=0; i<yearsTable.size(); i++) {
-            String year = yearsTable.get(i).text().replaceAll("&nbsp;","null");
-            String dat = "";
+            String year = yearsTable.get(i).text().replaceAll("&nbsp;","");
+            String umsatz = "";
             //String in folgender Darstellung aufteilen auf die einzelnen Jahreszahlen: "Jahr1 Jahr2 Jahr3 Jahr4"
-            for(int j=0; j<daten.length(); j++) {
-                if(' ' == (daten.charAt(j))) {
-                    dat = daten.substring(0,j);
-                    daten = daten.substring(j+1);
+            for(int j=1; j<umsatzDaten.length(); j++) {
+                if(' ' == (umsatzDaten.charAt(j))) {
+                    umsatz = umsatzDaten.substring(0,j);
+                    umsatzDaten = umsatzDaten.substring(j+1);
+                    //System.out.println("umsatz("+umsatz+"),umsatzDaten("+umsatzDaten+")");
+                    break;
+                }
+                //System.out.println("ZWEI:umsatz("+umsatz+"),umsatzDaten("+umsatzDaten+")");
+            }
+            String ekap = "";
+            for(int j=1; j<ekapDaten.length(); j++) {
+                if(' ' == (ekapDaten.charAt(j))) {
+                    ekap = ekapDaten.substring(0,j);
+                    ekapDaten = ekapDaten.substring(j+1);
                     break;
                 }
             }
-            dat = dat.replaceAll("&nbsp;","null");
-            dat = dat.replaceAll("e","");
-            year = year.replaceAll("e","");
-            if(debug) System.out.println("FeederOnvistaLowMem: Umsatz: Jahr(" + i + "): " + year);
-            if(debug) System.out.println("FeederOnvistaLowMem: Umsatz: Daten(" + i + "): " + dat);
-            if(!(year == null || year.equals("") || dat == null || dat.equals(""))) {   //nur für vorhandene Werte weiterverarbeiten (Achtung: "-" ist vorhandener Wert, aber ungültig!)
+            String gkap = "";
+            for(int j=1; j<gkapDaten.length(); j++) {
+                if(' ' == (gkapDaten.charAt(j))) {
+                    gkap = gkapDaten.substring(0,j);
+                    gkapDaten = gkapDaten.substring(j+1);
+                    break;
+                }
+            }
+            String ebit = "";
+            for(int j=1; j<ebitDaten.length(); j++) {
+                if(' ' == (ebitDaten.charAt(j))) {
+                    ebit = ebitDaten.substring(0,j);
+                    ebitDaten = ebitDaten.substring(j+1);
+                    break;
+                }
+            }
+            String jue = "";
+            for(int j=1; j<jueDaten.length(); j++) {
+                if(' ' == (jueDaten.charAt(j))) {
+                    jue = jueDaten.substring(0,j);
+                    jueDaten = jueDaten.substring(j+1);
+                    break;
+                }
+            }
+            //letzte Ausgabe der jeweiligen Datensätze auf die Variable zuweisen; sonst: letzter Datenbankeintrag geschieht nicht weil Strings leer wären!
+            if(i == yearsTable.size()-1) {
+                umsatz = umsatzDaten;
+                ekap = ekapDaten;
+                gkap = gkapDaten;
+                ebit = ebitDaten;
+                jue = jueDaten;
+            }
+            //nur für vorhandene Werte weiterverarbeiten
+            //(Achtung: "-" ist gültiger Wert für Bilanzdaten, drückt aus, dass keine Daten vorhanden!)
+            //(Achtung: "JahrXe" wird angezeigt, falls keine Daten vorhanden (glaube ich zumindest)!)
+            if(!(year.equals("") || umsatz.equals("") || ekap.equals("") || gkap.equals("") || ebit.equals("") || jue.equals(""))) {
                 //TODO: hier Datenbank-Operationen oder whatever zur Datenweiterverarbeitung!
-                System.out.println("Hier könnte Ihre Werbung stehen (" + i + ")");
+                if(InetAddress.getLocalHost().toString().contains("Andreas-PC")) {
+                    if(debug) System.out.println("FeederOnvistaLowMem: Schleife("+i+"),Jahr("+year+"),Umsatz("+umsatz+"),Eigenkap("+ekap+"),Gesamtkap("+gkap+"),EBIT("+ebit+"),JÜ("+jue+")");
+                    DBOperations.dbInsertOnvistaBilanzData(conn, isin, wkn, aname, year, umsatz, ekap, gkap, ebit, jue);
+                }
+                else System.out.println("FeederOnvistaLowMem: Z.187: Hier könnte ein Insert-Befehl stehen.");
             }
         }
-        /*
+        /*  DATENBANK
         try {
             DBOperations.dbInsertFeeder(conn, isin, wkn, aname, input, "Onvista");
         } catch (SQLException ex) {
             System.err.println("FeederOnvistaLowMem: Z.126: " + ex.getCause() + " | " + ex.getMessage() + " | " + ex.getStackTrace());
-        }
-        */
+        } */
     }
 
 }

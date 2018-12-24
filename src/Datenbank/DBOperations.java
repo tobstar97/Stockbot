@@ -49,13 +49,21 @@ public class DBOperations {
     }
 
     public static void dbInsertFeeder(Connection conn, String isin, String wkn, String aktienname, String link, String quelle) throws SQLException {
-        ResultSet rs = null;
         Statement stmt = conn.createStatement();
-        rs = stmt.executeQuery(
+        stmt.executeQuery(
             "REPLACE INTO feeder (isin, wkn, aktienname, link, quelle)" + "\n" +
                 "VALUES ('"+ isin +"', '"+ wkn +"', '"+ aktienname +"', '"+ link +"', '"+ quelle +"')"
         );
         if (debug) System.out.println("INSERTED into Feeder: ISIN(" + isin + "), WKN(" + wkn + "), Aktienname(" + aktienname + "), Link(" + link + "), Quelle(" + quelle + ")");
+    }
+
+    public static void dbInsertOnvistaBilanzData(Connection conn, String isin, String wkn, String aktienname, String jahr, String umsatz, String ekap, String gkap, String ebit, String jue) throws SQLException {
+        Statement stmt = conn.createStatement();
+        stmt.executeQuery(
+            "REPLACE INTO bilanzOnvista (isin, wkn, aktienname, jahr, umsatz, eigenkapital, gesamtkapital, ebit, gewinn)" + "\n" +
+                "VALUES ('"+ isin +"', '"+ wkn +"', '"+ aktienname +"', '"+ jahr +"', '"+ umsatz +"', '"+ ekap +"', '"+ gkap +"', '"+ ebit +"', '"+ jue +"')"
+        );
+        if (debug) System.out.println("INSERTED into Feeder: ISIN(" + isin + "), WKN(" + wkn + "), Aktienname(" + aktienname + "), Jahr(" + jahr + "), Umsatz(" + umsatz + "), Ekap(" + ekap + "), Gkap(" + gkap + "), EBIT(" + ebit + "), Gewinn(" + jue + ")");
     }
 
 }
