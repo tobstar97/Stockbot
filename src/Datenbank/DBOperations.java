@@ -48,14 +48,14 @@ public class DBOperations {
         }
     }
 
-    public static void dbInsert(Connection conn, String isin, String aktienname, String link, String quelle) throws SQLException {
+    public static void dbInsertFeeder(Connection conn, String isin, String wkn, String aktienname, String link, String quelle) throws SQLException {
         ResultSet rs = null;
         Statement stmt = conn.createStatement();
         rs = stmt.executeQuery(
-            "REPLACE INTO feeder (isin, aktienname, link, quelle)" + "\n" +
-                "VALUES ('"+ isin +"', '"+ aktienname +"', '"+ link +"', '"+ quelle +"')"
+            "REPLACE INTO feeder (isin, wkn, aktienname, link, quelle)" + "\n" +
+                "VALUES ('"+ isin +"', '"+ wkn +"', '"+ aktienname +"', '"+ link +"', '"+ quelle +"')"
         );
-        if (debug) System.out.println("INSERTED into Feeder: ISIN(" + isin + "), Aktienname(" + aktienname + "), Link(" + link + "), Quelle(" + quelle + ")");
+        if (debug) System.out.println("INSERTED into Feeder: ISIN(" + isin + "), WKN(" + wkn + "), Aktienname(" + aktienname + "), Link(" + link + "), Quelle(" + quelle + ")");
     }
 
 }

@@ -4,6 +4,8 @@ import Datenbank.DBOperations;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -19,14 +21,14 @@ public class FeederOnvistaLowMem {
         conn = connection;
         try {
             if(debug) System.out.println("FeederOnvista()");
-            getLaender();
+            searchLaender();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
 
-    private void getLaender() throws IOException{
+    private void searchLaender() throws IOException{
         Document doc = Jsoup.connect(url).get();
         Element e = doc.getElementsByClass("land-list").first();
         int i = 0;
@@ -34,32 +36,17 @@ public class FeederOnvistaLowMem {
             Element table = doc.getElementsByClass("land-list-item").get(i);
             Element meta = table.child(0);
             String result = meta.attr("abs:href");
-            getAktien(result);
+            searchAktien(result);
             i++;
             if(debug) System.out.println("getLaender(): " + result);
         }
     }
 
-    private void getAktien(String input) throws IOException {
+    private void searchAktien(String input) throws IOException {
         Document doc = Jsoup.connect(input).get();
         Element e = doc.getElementsByClass("LETZTER").first();
 
         if (e == null){
-            /*
-            int t = doc.select("td.TEXT").size();
-            for(int i=0; i<t; i++) {
-                Element meta = doc.select("td.TEXT").get(i);
-                try {
-                    String table = meta.child(0).attr("abs:href");
-                    getData(table);
-                    if (debug) System.out.println("getAktien(): " + table);
-                } catch (IndexOutOfBoundsException ex) {
-                    System.err.println("FeederOnvistaLowMem: Z.60: " + ex.getCause() + " | " + ex.getMessage() + " | " + ex.getStackTrace());
-                } finally {
-                    i += 3;
-                }
-            }
-            */
             int f = doc.select("div.BLAETTER_NAVI:nth-child(1) > span:nth-child(1)").size();
 
             String cut = input;
@@ -115,16 +102,80 @@ public class FeederOnvistaLowMem {
         }
     }
 
-    private void getData(String input) {
+    private void getData(String input) throws IOException {
         String isin = input.substring(input.length()-12);
         String aname = input.substring(31,input.length()-13);
-        if(debug) System.out.println("getData() > ISIN: " + isin);
-        if(debug) System.out.println("getData() > Aktienname: " + aname);
+        String wkn = Jsoup.connect(input).get().select("div[class=\"WERTPAPIER_DETAILS\"]").first().text().substring(4,10);
+        if(debug) System.out.println("FeederOnvistaLowMem: getData() > ISIN: " + isin);
+        if(debug) System.out.println("FeederOnvistaLowMem: getData() > Aktienname: " + aname);
+        if(debug) System.out.println("FeederOnvistaLowMem: getData() > WKN: " + wkn);
+
+        //Fundamentalkennzahlen (Jahresabschluss):
+        String basicLink = "https://www.onvista.de/aktien/fundamental/";
+        String connectToLink = basicLink + aname + "-" + isin;
+        Document doc = Jsoup.connect(connectToLink).get();
+        //Umsatz in Mio. EUR
+            //Jahre
+        Element years = doc.select("th").get(32);
+        Elements yearsTable = years.siblingElements();
+            //Daten
+        Element data = doc.getElementsByClass("INFOTEXT").get(8);
+        Elements dataTable = data.siblingElements();
+        //System.out.println(dataTable);
+/*            //Strings
+        for(int i=0; i<yearsTable.size() && i<dataTable.size(); i++) {
+            String year = yearsTable.get(i).text().replaceAll("&nbsp;","null");
+            String dat = dataTable.get(i).text().replaceAll("&nbsp;","null");
+            dat = dat.replaceAll("e","");
+            year = year.replaceAll("e","");
+            if(debug) System.out.println("FeederOnvistaLowMem: Umsatz: Jahr(" + i + "): " + year);
+            if(debug) System.out.println("FeederOnvistaLowMem: Umsatz: Daten(" + i + "): " + dat);
+            if(!(year == null || year.equals("") || dat == null || dat.equals(""))) {   //nur für vorhandene Werte weiterverarbeiten (Achtung: "-" ist vorhandener Wert, aber ungültig!)
+                //TODO: hier Datenbank-Operationen oder whatever zur Datenweiterverarbeitung!
+                System.out.println("Hier könnte Ihre Werbung stehen (" + i + ")");
+            }
+        }
+*/
+        //Bilanz-GUV
+        String guvLink = "https://www.onvista.de/aktien/bilanz-guv/";
+        String connGUVLink = guvLink + aname + "-" + isin;
+        doc = Jsoup.connect(connGUVLink).get();
+        //Umsatz in Mio. EUR
+            //Jahre
+        years = doc.select("th").get(26);
+        yearsTable = years.siblingElements();
+            //Daten
+        data = doc.select("tr").get(15);
+        String daten = data.text().substring(19);
+            //Strings
+        for(int i=0; i<yearsTable.size(); i++) {
+            String year = yearsTable.get(i).text().replaceAll("&nbsp;","null");
+            String dat = "";
+            //String in folgender Darstellung aufteilen auf die einzelnen Jahreszahlen: "Jahr1 Jahr2 Jahr3 Jahr4"
+            for(int j=0; j<daten.length(); j++) {
+                if(' ' == (daten.charAt(j))) {
+                    dat = daten.substring(0,j);
+                    daten = daten.substring(j+1);
+                    break;
+                }
+            }
+            dat = dat.replaceAll("&nbsp;","null");
+            dat = dat.replaceAll("e","");
+            year = year.replaceAll("e","");
+            if(debug) System.out.println("FeederOnvistaLowMem: Umsatz: Jahr(" + i + "): " + year);
+            if(debug) System.out.println("FeederOnvistaLowMem: Umsatz: Daten(" + i + "): " + dat);
+            if(!(year == null || year.equals("") || dat == null || dat.equals(""))) {   //nur für vorhandene Werte weiterverarbeiten (Achtung: "-" ist vorhandener Wert, aber ungültig!)
+                //TODO: hier Datenbank-Operationen oder whatever zur Datenweiterverarbeitung!
+                System.out.println("Hier könnte Ihre Werbung stehen (" + i + ")");
+            }
+        }
+        /*
         try {
-            DBOperations.dbInsert(conn, isin, aname, input, "Onvista");
+            DBOperations.dbInsertFeeder(conn, isin, wkn, aname, input, "Onvista");
         } catch (SQLException ex) {
             System.err.println("FeederOnvistaLowMem: Z.126: " + ex.getCause() + " | " + ex.getMessage() + " | " + ex.getStackTrace());
         }
+        */
     }
 
 }
