@@ -190,6 +190,7 @@ public class OnvistaTest {
 
     /**
      * durchläuft eine Seite, um alle Links zu den Aktien zu bekommen
+     * @author Tobias Heiner
      */
     public void aktienDurchlaufen(){
         int t = doc.select("td.TEXT").size();
