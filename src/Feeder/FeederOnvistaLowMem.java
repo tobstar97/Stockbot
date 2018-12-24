@@ -106,6 +106,12 @@ public class FeederOnvistaLowMem {
         String isin = input.substring(input.length()-12);
         String aname = input.substring(30,input.length()-13);
         String wkn = Jsoup.connect(input).get().select("div[class=\"WERTPAPIER_DETAILS\"]").first().text().substring(4,10);
+        Boolean wknBool = true;
+        //verifizieren, dass es sich wirklich um eine WKN handelt, oder ob die WKN nicht vorhanden ist
+        for(int i=0; i<wkn.length(); i++) {
+            if(wkn.charAt(i) >= 97 && wkn.charAt(i) <= 122) wknBool = false;
+        }
+        if(!wknBool) wkn = null;
         if(debug) System.out.println("FeederOnvistaLowMem: getData() > ISIN: " + isin);
         if(debug) System.out.println("FeederOnvistaLowMem: getData() > Aktienname: " + aname);
         if(debug) System.out.println("FeederOnvistaLowMem: getData() > WKN: " + wkn);
