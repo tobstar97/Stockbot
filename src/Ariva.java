@@ -167,10 +167,28 @@ public class Ariva {
      * @throws IOException
      */
     public String haupthandelsplatz (String str)throws IOException{
-        doc = Jsoup.connect("https://www.ariva.de/"+str+"/kurs").get();
+
+        try{
+            doc = Jsoup.connect("https://www.ariva.de/"+str+"/kurs").get();
+        }catch(ConnectException e){
+            System.err.println("Probleme bei der Link-Eingabe");
+        }
+
+
+        //Hier testen ob die Aktie überhaupt eingetragene Kurse hat:
+        Element e2 = doc.getElementById("result_table_0").child(2);
+        String temp2 = e2.toString();
+        //System.out.println(temp2);
+
+        if(temp2.contains("keine Kurse vorhanden")){
+            return "boerse_id=";
+        }
+
+
+        //Ab hier der Normalfall/Gutfall
         Element e = doc.getElementsByClass("ellipsis padding-right-5").get(3);
         Element meta = e.child(0);
-        System.out.println("Handelsplatz: " +e.text());
+        //System.out.println("Handelsplatz: " +e.text());
 
         //Ab hier etwas unschön programmiert aber funktioniert!
         //meta zu String umwandeln
@@ -192,10 +210,10 @@ public class Ariva {
         }
 
         //Substring ausgeben
-        String temp2 = temp.substring(x+1, y-1);
-        //System.out.println(temp2);
+        String temp3 = temp.substring(x+1, y-1);
+        //System.out.println(temp3);
 
-        return temp2;
+        return temp3;
     }
 
 
