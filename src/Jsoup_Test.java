@@ -57,7 +57,8 @@ public class Jsoup_Test {
         }
         */
         //ONVISTA
-        FeederOnvistaLowMem fo = new FeederOnvistaLowMem(conn);
+        //FeederOnvistaLowMem fo = new FeederOnvistaLowMem(conn);
+        Onvista.catchBilanzData("https://www.onvista.de/aktien/SCHALTBAU-HOLDING-AG-Aktie-DE000A2NBTL2");
         /*
         ArrayList<String> arrOnvistaAktiennamen = fo.sendAktiennamen();
         ArrayList<String> arrOnvistaISINs = fo.sendISINs();
@@ -85,8 +86,8 @@ public class Jsoup_Test {
         System.out.println("-----------------------");
         System.out.println("-=- -=- Onvista -=- -=-");
         Onvista onvista = new Onvista();    //Wirecard-Aktie-DE0007472060
-        System.out.println("main:Onvista: Gewinn Wirecard: " + onvista.getGewinn());            //TODO NULLPOINTER
-        System.out.println("main:Onvista: Kurs Wirecard: " + onvista.getKurs());                //TODO NULLPOINTER
+        System.out.println("main:Onvista: Gewinn Wirecard: " + onvista.getGewinn());
+        System.out.println("main:Onvista: Kurs Wirecard: " + onvista.getKurs());
 *//*
         //Morningstar
         System.out.println("---------------------------");
