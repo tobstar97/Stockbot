@@ -64,7 +64,7 @@ public class FeederArivaFX extends Application {
                 button.click();
                 if(debug) System.out.println("BTN: clicked");
                 //CSS querying for links
-                System.out.println("I DONT FUCKING KNOW HOW THIS SHOULD WORK AT ANY TIME...");
+                System.out.println("I DONT FUCKING KNOW HOW THIS SHOULD WORK AT ANY TIME...");  //TODO FUCKING JAVASCRIPT
                 System.out.println("finished process");
             }
         });
