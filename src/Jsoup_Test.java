@@ -1,16 +1,9 @@
 import Datenbank.DBConnection;
-import Datenbank.DBOperations;
-import Feeder.FeederMorningstar;
-import Feeder.FeederOnvista;
+import Feeder.FeederArivaFX;
 import Feeder.FeederOnvistaLowMem;
-import Hilfsklassen.WebsiteTimestamps;
-import Feeder.FeederAriva;
+import javafx.stage.Stage;
 
-import java.net.InetAddress;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Tobias Heiner, andygschaider
@@ -44,7 +37,7 @@ public class Jsoup_Test {
         //FeederAriva fa = new FeederAriva();
         //System.out.println(fa.sendSetToAriva());
         //FeederMorningstar fm = new FeederMorningstar();
-        conn = new DBConnection().setupConnection();
+        //conn = new DBConnection().setupConnection();
         //ARIVA
         /*
         FeederAriva fa = new FeederAriva();
@@ -58,7 +51,15 @@ public class Jsoup_Test {
         */
         //ONVISTA
         //FeederOnvistaLowMem fo = new FeederOnvistaLowMem(conn);
-        Onvista.catchBilanzData("https://www.onvista.de/aktien/SCHALTBAU-HOLDING-AG-Aktie-DE000A2NBTL2");
+        new Thread() {
+            @Override
+            public void run() {
+                javafx.application.Application.launch(FeederArivaFX.class);
+            }
+        }.start();
+        FeederArivaFX startUpTest = FeederArivaFX.waitForFeederArivaFX();
+        startUpTest.printSomething();
+        //Onvista.catchBilanzData("https://www.onvista.de/aktien/SCHALTBAU-HOLDING-AG-Aktie-DE000A2NBTL2");
         /*
         ArrayList<String> arrOnvistaAktiennamen = fo.sendAktiennamen();
         ArrayList<String> arrOnvistaISINs = fo.sendISINs();
