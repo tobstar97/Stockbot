@@ -151,7 +151,7 @@ public class Hilfsmethoden {
         return f;
     }
 
-    public static void broodForce(String alphabet, String result, int length) {
+    public static void broodForce(String alphabet, int length) {
         long sum = 0;
         for(int i=1; i<=length; i++) {
             System.out.println("broodForce(" + i + "): " + (int) Math.pow(alphabet.length(),i) + " Lösungen.");
@@ -169,7 +169,7 @@ public class Hilfsmethoden {
             for (int i = 0; i < chararr.length; i++) {
                 String temp = result;
                 temp += chararr[i];
-                //if(debug) System.out.println("broodForce(" + temp + ")");
+                if(debug) System.out.println("broodForce(" + temp + ")");
                 broodForceInsinde(alphabet, temp, length);
             }
         }
