@@ -3,6 +3,9 @@ import Feeder.FeederArivaFX;
 import Feeder.FeederOnvistaLowMem;
 import Hilfsklassen.Hilfsmethoden;
 import javafx.stage.Stage;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import java.sql.Connection;
 
@@ -139,6 +142,32 @@ public class Jsoup_Test {
             }
         }
 */
+
+        //Multiplier-Tests
+        /*
+        Document doc = null;
+        try {
+            doc = Jsoup.connect("https://www.onvista.de/aktien/bilanz-guv/Amazon-Aktie-US0231351067").get();
+        } catch (Exception e) {
+            System.err.println("Err in Jsoup_Test: Z.148: unable to connect to document: amazon-Aktie");
+        }
+        int getMultiplier = -1;
+        String multiplierString = "nach ";
+        for(int i=0;i<doc.select("td[class=\"ZAHL\"]").size();i++) {
+            if(doc.select("td[class=\"ZAHL\"]").get(i).text().length() >= multiplierString.length())
+                if(doc.select("td[class=\"ZAHL\"]").get(i).text().substring(0,multiplierString.length()).equals(multiplierString)) getMultiplier = i;
+        }
+        Element multiplierData = doc.select("td[class=\"ZAHL\"]").get(getMultiplier);
+        String multiplierDaten = "- - - - -";
+        if(getMultiplier != -1) multiplierDaten = multiplierData.text().substring(multiplierString.length());
+        System.out.println(multiplierDaten);
+        String bilanzierungsmethode = multiplierDaten.substring(0,multiplierDaten.indexOf(" in "));
+        String multiplier = multiplierDaten.substring(multiplierDaten.indexOf(" in ")+4,multiplierDaten.lastIndexOf('.'));
+        String waehrung = multiplierDaten.substring(multiplierDaten.lastIndexOf('.')+2);
+        System.out.println("BilMeth: " + bilanzierungsmethode);
+        System.out.println("Multipl: " + multiplier);
+        System.out.println("Waehrun: " + waehrung);
+        */
     }
 
 }

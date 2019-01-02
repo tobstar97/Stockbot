@@ -9,6 +9,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -82,18 +83,24 @@ public class FeederOnvistaLowMem {
         try {
             doc = Jsoup.connect(input).get();
         } catch (IOException e) {
-            System.err.println(this.getClass().getName() + ": aktieDurchlaufen(): Z95: unable to connect to document \"" + input + "\"");
+            System.err.println(this.getClass().getName() + ": aktieDurchlaufen(): Z84: unable to connect to document \"" + input + "\"");
         }
         int t = doc.select("td.TEXT").size();
         for(int kl=0; kl<t; kl+=3) {
             try {
                 doc = Jsoup.connect(cut).get();
+            } catch (Exception ex) {
+                System.err.println(this.getClass().getName() + ": aktieDurchlaufen(): Z.91: " + ex.getCause() + " | " + ex.getMessage());
+            }
+            if(doc.select("td.TEXT").size() > kl) {
                 Element meta = doc.select("td.TEXT").get(kl);
                 String tab = meta.child(0).attr("abs:href");
-                onvista.catchBilanzData(tab);
-                if (debug) System.out.println("aktieDurchlaufen(): " + tab);
-            } catch (Exception ex) {
-                System.err.println(this.getClass().getName() + ": aktieDurchlaufen(): Z.100: " + ex.getCause() + " | " + ex.getMessage());
+                try {
+                    if (debug) System.out.println("aktieDurchlaufen(): " + tab);
+                    onvista.catchBilanzData(tab);
+                } catch (UnknownHostException e) {
+                    System.err.println(this.getClass().getName() + ": aktieDurchlaufen(): Z. 98: " + e.getCause() + " | " + e.getMessage());
+                }
             }
         }
     }
