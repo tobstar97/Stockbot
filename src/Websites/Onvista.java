@@ -216,11 +216,16 @@ public class Onvista {
                     jue = jueDaten;
                 }
                 //in richtiges Format bringen: alle Kommas zu Punkten ändern
-                umsatz = umsatz.replaceAll(",", ".");
-                ekap = ekap.replaceAll(",", ".");
-                gkap = gkap.replaceAll(",", ".");
-                ebit = ebit.replaceAll(",", ".");
-                jue = jue.replaceAll(",", ".");
+                if(!umsatz.equals("-")) umsatz = umsatz.replaceAll(".","");
+                if(!ekap.equals("-")) ekap = ekap.replaceAll(".","");
+                if(!gkap.equals("-")) gkap = gkap.replaceAll(".","");
+                if(!ebit.equals("-")) ebit = ebit.replaceAll(".","");
+                if(!jue.equals("-")) jue = jue.replaceAll(".","");
+                if(!umsatz.equals("-")) umsatz = umsatz.replaceAll(",", ".");
+                if(!ekap.equals("-")) ekap = ekap.replaceAll(",", ".");
+                if(!gkap.equals("-")) gkap = gkap.replaceAll(",", ".");
+                if(!ebit.equals("-")) ebit = ebit.replaceAll(",", ".");
+                if(!jue.equals("-")) jue = jue.replaceAll(",", ".");
                 //Anwendung des Multipliers
                 if(!umsatz.equals("-")) {  //parseFloat funktioniert nicht wenn input = '-'
                     float u = Float.parseFloat(umsatz); //muss float sein für Berechnung
