@@ -63,8 +63,10 @@ public class Onvista {
         }
         //Plausibilisierung des Links zu den Bilanzdaten der Aktie
         boolean valid = true;
-        if(doc.select("a[href]").size() < 150 || doc.select("a[href]").size() > 300) {
-            valid = false;  //< 150 || > 300: wir sind gerade auf keiner Bilanzseite, sondern im Error 404 page not found!
+        if(doc.select("h1[property=\"v:title\"]").get(0).text().equals("404 Seite")) {
+            valid = false;  //Error 404 page not found.
+        } else if(doc.select("a[href]").size() < 150 || doc.select("a[href]").size() > 300) {
+            valid = false;  //< 150 || > 300: wir sind gerade auf keiner Bilanzseite, da die Anzahl der auf ihr befindlichen Links nicht stimmt!
         }
 
         //nur falls auf valide Bilanzseite verbunden ausführen:
@@ -144,15 +146,21 @@ public class Onvista {
             Element multiplierData = null;
             if (getMultiplier != -1) multiplierData = doc.select("td[class=\"ZAHL\"]").get(getMultiplier);
             String multiplierDaten = "- - - - -";
+            String bilanzierungsmethode = null;
+            String multiplierValueString = null;
+            String waehrung = null;
+            int multiplier = 1;
             if (getMultiplier != -1) {
                 multiplierDaten = multiplierData.text().substring(multiplierString.length());
-                if (debug) System.out.println("multiplierDaten: " + multiplierDaten);
-                String bilanzierungsmethode = multiplierDaten.substring(0, multiplierDaten.indexOf(" in "));
-                String multiplier = multiplierDaten.substring(multiplierDaten.indexOf(" in ") + 4, multiplierDaten.lastIndexOf('.'));
-                String waehrung = multiplierDaten.substring(multiplierDaten.lastIndexOf('.') + 2);
-                if (debug) System.out.println("Bilanzierungsmethode: " + bilanzierungsmethode);
-                if (debug) System.err.println("Multiplier: " + multiplier);
-                if (debug) System.out.println("Währung: " + waehrung);
+                //if (debug) System.out.println("multiplierDaten: " + multiplierDaten);
+                bilanzierungsmethode = multiplierDaten.substring(0, multiplierDaten.indexOf(" in "));
+                multiplierValueString = multiplierDaten.substring(multiplierDaten.indexOf(" in ") + 4, multiplierDaten.lastIndexOf('.'));
+                waehrung = multiplierDaten.substring(multiplierDaten.lastIndexOf('.') + 2);
+                if (debug) System.out.println(this.getClass().getName() + ": getData() > Bilanzierungsmethode: " + bilanzierungsmethode);
+                if (debug) System.out.println(this.getClass().getName() + ": getData() > Multiplier: " + multiplierValueString);
+                if (debug) System.out.println(this.getClass().getName() + ": getData() > Währung: " + waehrung);
+                if(multiplierValueString.equals("Mio")) multiplier = 1000000;
+                if(multiplierValueString.equals("Tsd")) multiplier = 1000;  //kein Plan ob es den Multiplier Tausend gibt... aber einfach mal vorsorglich.
             }
 
             //Strings
@@ -213,18 +221,31 @@ public class Onvista {
                 gkap = gkap.replaceAll(",", ".");
                 ebit = ebit.replaceAll(",", ".");
                 jue = jue.replaceAll(",", ".");
-
                 //Anwendung des Multipliers
-                //parseFloat funktioniert nicht wenn local input = '-'
-                if (!umsatz.equals("-")) {
-                    float u = Float.parseFloat(umsatz);
-                    u *= 1000000;   //Umsatz *= 1.000.000
-                    umsatz = String.valueOf(u);
+                if(!umsatz.equals("-")) {  //parseFloat funktioniert nicht wenn input = '-'
+                    float u = Float.parseFloat(umsatz); //muss float sein für Berechnung
+                    u *= multiplier;   //Umsatz *= 1.000.000
+                    umsatz = String.valueOf(u); //Konvertierung in String für Speicherung in DB (ggf. anzupassen: TODO)
                 }
-                if (!gkap.equals("-")) {
+                if(!ekap.equals("-")) {
+                    float e = Float.parseFloat(ekap);
+                    e *= multiplier;
+                    ekap = String.valueOf(e);
+                }
+                if(!gkap.equals("-")) {
                     float g = Float.parseFloat(gkap);
-                    g *= 1000000;   //Bilanzsumme *= 1.000.000
+                    g *= multiplier;   //Bilanzsumme *= 1.000.000
                     gkap = String.valueOf(g);
+                }
+                if(!ebit.equals("-")) {
+                    float e = Float.parseFloat(ebit);
+                    e *= multiplier;
+                    ebit = String.valueOf(e);
+                }
+                if(!jue.equals("-")) {
+                    float j = Float.parseFloat(jue);
+                    j *= multiplier;
+                    jue = String.valueOf(j);
                 }
 
                 //nur für vorhandene Werte weiterverarbeiten
@@ -234,15 +255,15 @@ public class Onvista {
                     //TODO: hier Datenbank-Operationen oder whatever zur Datenweiterverarbeitung!
                     if (InetAddress.getLocalHost().toString().contains("Andreas-PC")) {
                         if (debug)
-                            System.out.println("FeederOnvistaLowMem: Schleife(" + i + "),Jahr(" + year + "),Umsatz(" + umsatz + "),Eigenkap(" + ekap + "),Gesamtkap(" + gkap + "),EBIT(" + ebit + "),JÜ(" + jue + ")");
+                            System.out.println("FeederOnvistaLowMem: Schleife(" + i + "),Jahr(" + year + "),Währung(" + waehrung + "),Umsatz(" + umsatz + "),Eigenkap(" + ekap + "),Gesamtkap(" + gkap + "),EBIT(" + ebit + "),JÜ(" + jue + ")");
                     /*
                     try {
-                        DBOperations.dbInsertOnvistaBilanzData(conn, isin, wkn, aname, year, umsatz, ekap, gkap, ebit, jue);
+                        DBOperations.dbInsertOnvistaBilanzData(conn, isin, wkn, aname, year, waehrung, umsatz, ekap, gkap, ebit, jue);
                     } catch(SQLException e) {
                         System.err.println(this.getClass().getName() + ": catchBilanzData: Z.200: " + e.getMessage() + " | " + e.getCause());
                     }
                     */
-                    } else System.out.println("FeederOnvistaLowMem: Z.187: Hier könnte ein Insert-Befehl stehen.");
+                    } else System.out.println("FeederOnvistaLowMem: Z.266: Hier könnte ein Insert-Befehl stehen.");
                 }
             }
         } else System.err.println(this.getClass().getName() + ": catchBilanzData(): kein gültiger Bilanzlink: \"" + input + "\"");
