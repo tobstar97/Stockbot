@@ -1,6 +1,7 @@
 package Feeder;
 
 import Datenbank.DBOperations;
+import Websites.Onvista;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,12 +16,14 @@ public class FeederOnvistaLowMem {
 
     Boolean debug = true;
     Connection conn;
+    Onvista onvista;
     String url = "https://www.onvista.de/aktien/aktien-laender/";
 
     public FeederOnvistaLowMem(Connection connection) {
         conn = connection;
+        onvista = new Onvista();
         try {
-            if(debug) System.out.println("FeederOnvista()");
+            if(debug) System.out.println(">> " + this.getClass().getName());
             searchLaender();
         } catch (IOException e) {
             e.printStackTrace();
@@ -45,7 +48,7 @@ public class FeederOnvistaLowMem {
     private void searchAktien(String input) throws IOException {
         Document doc = Jsoup.connect(input).get();
         Element e = doc.getElementsByClass("LETZTER").first();
-
+        //wenn es kein LETZTE Seite - Element gibt
         if (e == null){
             int f = doc.select("div.BLAETTER_NAVI:nth-child(1) > span:nth-child(1)").size();
 
@@ -55,54 +58,46 @@ public class FeederOnvistaLowMem {
 
             while(o<=f){
                 cut += (o+1);
-                int t = doc.select("td.TEXT").size();
-                //System.out.println(t);
-                int i = 0;
-                while(i < t){       //try catch benötigt (wie unten) -- erledigt
-                    try{
-                        doc = Jsoup.connect(cut).get();
-                        Element meta = doc.select("td.TEXT").get(i);
-                        String table = meta.child(0).attr("abs:href");
-                        if (debug) System.out.println("getAktien(): " + table);
-                        getData(table);
-                    }catch (Exception ex){
-                        System.err.println("FeederOnvistaLowMem: Z.82: " + ex.getCause() + " | " + ex.getMessage() + " | " + ex.getStackTrace());
-                    }finally {
-                        i = i+3;
-                    }
-                }
+                aktieDurchlaufen(input,cut);
                 o++;
                 cut = cut.replace(String.valueOf(o), "");
             }
-        } else {
+        } else { //wenn es ein LETZTE Seite - Element gibt: letzte Seite wählen, Wert speichern und Seiten durchlaufen
             String cut = input;
             String temp = e.child(0).attr("abs:href");
             temp = temp.replace(cut, "");
 
             for(int i=1; i<=Integer.parseInt(temp); i++) {
                 cut += i;
-                //seite nach aktien durchlaufen
-                int t = doc.select("td.TEXT").size();
-                for(int kl=0; kl<t; kl++) {
-                    try {
-                        doc = Jsoup.connect(cut).get();
-                        Element meta = doc.select("td.TEXT").get(kl);
-                        String tab = meta.child(0).attr("abs:href");
-                        //getData(tab);
-                        catchBilanzData(tab);
-                        if (debug) System.out.println("getAktien(): " + tab);
-                    } catch (Exception ex) {
-                        System.err.println("FeederOnvistaLowMem: Z.107: " + ex.getCause() + " | " + ex.getMessage() + " | " + ex.getStackTrace());
-                    } finally {
-                        kl += 3;
-                    }
-                }
+                aktieDurchlaufen(input,cut);
                 cut = cut.replace(String.valueOf(i), "");
                 i++;
             }
         }
     }
 
+    private void aktieDurchlaufen(String input, String cut) {
+        //Seite nach Aktien durchlaufen
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(input).get();
+        } catch (IOException e) {
+            System.err.println(this.getClass().getName() + ": aktieDurchlaufen(): Z95: unable to connect to document \"" + input + "\"");
+        }
+        int t = doc.select("td.TEXT").size();
+        for(int kl=0; kl<t; kl+=3) {
+            try {
+                doc = Jsoup.connect(cut).get();
+                Element meta = doc.select("td.TEXT").get(kl);
+                String tab = meta.child(0).attr("abs:href");
+                onvista.catchBilanzData(tab);
+                if (debug) System.out.println("aktieDurchlaufen(): " + tab);
+            } catch (Exception ex) {
+                System.err.println(this.getClass().getName() + ": aktieDurchlaufen(): Z.100: " + ex.getCause() + " | " + ex.getMessage());
+            }
+        }
+    }
+/*
     private void catchBilanzData(String input) throws IOException, SQLException {
         String isin = input.substring(input.length() - 12);
         String aname = input.substring(30, input.length() - 13);
@@ -231,12 +226,14 @@ public class FeederOnvistaLowMem {
             ebit = ebit.replaceAll(",",".");
             jue = jue.replaceAll(",",".");
             //Multiplier        TODO:Multiplier abhängig von Bilanzierungsmethode
-            float u = Float.parseFloat(umsatz);
-            u *= 1000000;   //Umsatz *= 1.000.000
-            umsatz = String.valueOf(u);
-            float g = Float.parseFloat(gkap);
-            g *= 1000000;   //Bilanzsumme *= 1.000.000
-            gkap = String.valueOf(g);
+            //  FUNKTIONIERT NICHT WENN INPUT = '-'
+            //float u = Float.parseFloat(umsatz);
+            //u *= 1000000;   //Umsatz *= 1.000.000
+            //umsatz = String.valueOf(u);
+            //float g = Float.parseFloat(gkap);
+            //g *= 1000000;   //Bilanzsumme *= 1.000.000
+            //gkap = String.valueOf(g);
+
             //nur für vorhandene Werte weiterverarbeiten
             //(Achtung: "-" ist gültiger Wert für Bilanzdaten, drückt aus, dass keine Daten vorhanden!)
             //(Achtung: "JahrXe" wird angezeigt, falls keine Daten vorhanden (glaube ich zumindest)!)
@@ -286,7 +283,7 @@ public class FeederOnvistaLowMem {
         //Jahresüberschuss (Gewinn)                 get(24)
         Element jueData = doc.select("tr").get(24);
         String jueDaten = jueData.text().substring(17);
-            //Strings
+        //Strings
         for(int i=0; i<yearsTable.size(); i++) {
             String year = yearsTable.get(i).text().replaceAll("&nbsp;","");
             String umsatz = "";
@@ -347,17 +344,17 @@ public class FeederOnvistaLowMem {
                 //TODO: hier Datenbank-Operationen oder whatever zur Datenweiterverarbeitung!
                 if(InetAddress.getLocalHost().toString().contains("Andreas-PC")) {
                     if(debug) System.out.println("FeederOnvistaLowMem: Schleife("+i+"),Jahr("+year+"),Umsatz("+umsatz+"),Eigenkap("+ekap+"),Gesamtkap("+gkap+"),EBIT("+ebit+"),JÜ("+jue+")");
-                    DBOperations.dbInsertOnvistaBilanzData(conn, isin, wkn, aname, year, umsatz, ekap, gkap, ebit, jue);
+                    //DBOperations.dbInsertOnvistaBilanzData(conn, isin, wkn, aname, year, umsatz, ekap, gkap, ebit, jue);
                 }
-                else System.out.println("FeederOnvistaLowMem: Z.187: Hier könnte ein Insert-Befehl stehen.");
+                else System.out.println("FeederOnvistaLowMem: getData(): Hier könnte ein Insert-Befehl stehen.");
             }
         }
-        /*  DATENBANK
+        //  DATENBANK
         try {
             DBOperations.dbInsertFeeder(conn, isin, wkn, aname, input, "Onvista");
         } catch (SQLException ex) {
             System.err.println("FeederOnvistaLowMem: Z.126: " + ex.getCause() + " | " + ex.getMessage() + " | " + ex.getStackTrace());
-        } */
+        }
     }
-
+*/
 }

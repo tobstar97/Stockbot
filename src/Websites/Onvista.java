@@ -1,3 +1,5 @@
+package Websites;
+
 import Datenbank.DBConnection;
 import Datenbank.DBOperations;
 import org.jsoup.Jsoup;
@@ -7,17 +9,19 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * @author Tobias Heiner
- * @description stellt die verbindung zur website onvista.de her und liefert den aktuellen Kurs und Gewinn
+ * @author Andreas Gschaider
+ * @description fetcht Bilanz- und Kursdaten einer Aktie von Onvista.
  */
 public class Onvista {
 
     private static boolean debug = true;
     private static Connection conn;
+    private Document doc;
 
     {
         try {
@@ -28,68 +32,82 @@ public class Onvista {
     }
 
 
-    public static void catchBilanzData(String input) throws IOException, SQLException {
+    public void catchBilanzData(String input) throws UnknownHostException {
         String isin = input.substring(input.length() - 12);
         String aname = input.substring(30, input.length() - 13);
-        String wkn = Jsoup.connect(input).get().select("div[class=\"WERTPAPIER_DETAILS\"]").first().text().substring(4, 10);
+        String wkn = null;
+        try {
+            wkn = Jsoup.connect(input).get().select("div[class=\"WERTPAPIER_DETAILS\"]").first().text().substring(4, 10);
+        } catch (IOException e){
+            System.err.println(this.getClass().getName() + ": catchBilanzData: Z.41: " + e.getMessage() + " | " + e.getCause());
+        }
         Boolean wknBool = true;
         //verifizieren, dass es sich wirklich um eine WKN handelt, oder ob die WKN nicht vorhanden ist
         for (int i = 0; i < wkn.length(); i++) {
             if (wkn.charAt(i) >= 97 && wkn.charAt(i) <= 122) wknBool = false;
         }
         if (!wknBool) wkn = null;
-        if (debug) System.out.println("FeederOnvistaLowMem: getData() > ISIN: " + isin);
-        if (debug) System.out.println("FeederOnvistaLowMem: getData() > Aktienname: " + aname);
-        if (debug) System.out.println("FeederOnvistaLowMem: getData() > WKN: " + wkn);
+        if (debug) System.out.println(this.getClass().getName() + ": getData() > ISIN: " + isin);
+        if (debug) System.out.println(this.getClass().getName() + ": getData() > Aktienname: " + aname);
+        if (debug) System.out.println(this.getClass().getName() + ": getData() > WKN: " + wkn);
 
         //Bilanzdaten
         String guvLink = "https://www.onvista.de/aktien/bilanz-guv/";
         String connGUVLink = guvLink + aname + "-" + isin;
-        Document doc = Jsoup.connect(connGUVLink).get();
-    //Jahreszahlen extrahieren                  get(26)                 hier keine Suche im Dokument, da dies bisher immer funktioniert hat
+        try {
+            doc = Jsoup.connect(connGUVLink).get();
+        } catch (Exception e) {
+            System.err.println(this.getClass().getName() + ": unable to connect to Document doc with link \"" + connGUVLink + "\"");
+        }
+        //Jahreszahlen extrahieren                  get(26)                 hier keine Suche im Dokument, da dies bisher immer funktioniert hat
         Element years = doc.select("th").get(26);
         Elements yearsTable = years.siblingElements();
-    //Umsatz in Mio. EUR                        get(15)
+        //Umsatz in Mio. EUR                        get(15)
         int getUmsatz = -1;
         String umsatzString = "Umsatz in Mio. EUR";
         for(int i=0;i<doc.select("tr").size();i++) {    //Suche im Dokument nach dem Umsatz
-            if(doc.select("tr").get(i).text().substring(0,umsatzString.length()).equals(umsatzString)) getUmsatz = i;
+            if(doc.select("tr").get(i).text().length() >= umsatzString.length())
+                if (doc.select("tr").get(i).text().substring(0, umsatzString.length()).equals(umsatzString)) getUmsatz = i;
         }
         Element umsatzData = doc.select("tr").get(getUmsatz);
         String umsatzDaten = "- - - - -";
         if(getUmsatz != -1) umsatzDaten= umsatzData.text().substring(umsatzString.length()+1);
-    //Eigenkapital                              get(8)      //Suche im Dokument nach dem Eigenkapital
+        //Eigenkapital                              get(8)      //Suche im Dokument nach dem Eigenkapital
         int getEkap = -1;
         String eKapString = "Eigenkapital";
         for(int i=0;i<doc.select("tr").size();i++) {    //Suche im Dokument nach dem Umsatz
-            if(doc.select("tr").get(i).text().substring(0,eKapString.length()).equals(eKapString)) getEkap = i;
+            if(doc.select("tr").get(i).text().length() >= eKapString.length())
+                if(doc.select("tr").get(i).text().substring(0,eKapString.length()).equals(eKapString)) getEkap = i;
         }
         Element ekapData = doc.select("tr").get(getEkap);
         String ekapDaten = "- - - - -";
         if(getEkap != -1) ekapDaten = ekapData.text().substring(eKapString.length()+1);
-    //Gesamtkapital (=Bilanzsumme in Mio. EUR)  get(5)
+        //Gesamtkapital (=Bilanzsumme in Mio. EUR)  get(5)
         int getGkap = -1;
         String gKapString = "Bilanzsumme in Mio. EUR";
         for(int i=0;i<doc.select("tr").size();i++) {
-            if(doc.select("tr").get(i).text().substring(0,gKapString.length()).equals(gKapString)) getGkap = i;
+            if(doc.select("tr").get(i).text().length() >= gKapString.length())
+                if(doc.select("tr").get(i).text().substring(0,gKapString.length()).equals(gKapString)) getGkap = i;
         }
         Element gkapData = doc.select("tr").get(getGkap);
         String gkapDaten = "- - - - -";
         if(getGkap != -1) gkapDaten = gkapData.text().substring(gKapString.length()+1);
-    //EBIT                                      get(26)
+        //EBIT                                      get(26)
         int getEbit = -1;
         String ebitString = "EBIT";
         for(int i=0;i<doc.select("tr").size();i++) {
-            if(doc.select("tr").get(i).text().substring(0,ebitString.length()).equals(ebitString) && !doc.select("tr").get(i).text().substring(0,ebitString.length()+2).equals(ebitString+"DA")) getEbit = i;
+            if(doc.select("tr").get(i).text().length() >= ebitString.length())
+                if(doc.select("tr").get(i).text().substring(0,ebitString.length()).equals(ebitString) && !doc.select("tr").get(i).text().substring(0,ebitString.length()+2).equals(ebitString+"DA")) getEbit = i;
         }
         Element ebitData = doc.select("tr").get(getEbit);
         String ebitDaten = "- - - - -";
         if(getEbit != -1) ebitDaten = ebitData.text().substring(ebitString.length()+1);
-    //Jahresüberschuss (Gewinn)                 get(24)
+        //Jahresüberschuss (Gewinn)                 get(24)
         int getJue = -1;
         String jueString = "Jahresüberschuss";
         for(int i=0;i<doc.select("tr").size();i++) {
-            if(doc.select("tr").get(i).text().substring(0,jueString.length()).equals(jueString)) getJue = i;
+            if(doc.select("tr").get(i).text().length() >= jueString.length())
+                if(doc.select("tr").get(i).text().substring(0,jueString.length()).equals(jueString)) getJue = i;
         }
         Element jueData = doc.select("tr").get(getJue);
         String jueDaten ="- - - - -";
@@ -97,7 +115,7 @@ public class Onvista {
 
 
 
-    //Strings
+        //Strings
         for (int i = 0; i < yearsTable.size(); i++) {
             String year = yearsTable.get(i).text().replaceAll("&nbsp;", "");
             String umsatz = "";
@@ -156,12 +174,14 @@ public class Onvista {
             ebit = ebit.replaceAll(",",".");
             jue = jue.replaceAll(",",".");
             //Multiplier        TODO:Multiplier abhängig von Bilanzierungsmethode
+            /*  FUNKTIONIERT NICHT WENN INPUT = '-'
             float u = Float.parseFloat(umsatz);
             u *= 1000000;   //Umsatz *= 1.000.000
             umsatz = String.valueOf(u);
             float g = Float.parseFloat(gkap);
             g *= 1000000;   //Bilanzsumme *= 1.000.000
             gkap = String.valueOf(g);
+            */
             //nur für vorhandene Werte weiterverarbeiten
             //(Achtung: "-" ist gültiger Wert für Bilanzdaten, drückt aus, dass keine Daten vorhanden!)
             //(Achtung: "JahrXe" wird angezeigt, falls keine Daten vorhanden (glaube ich zumindest)!)
@@ -169,7 +189,13 @@ public class Onvista {
                 //TODO: hier Datenbank-Operationen oder whatever zur Datenweiterverarbeitung!
                 if (InetAddress.getLocalHost().toString().contains("Andreas-PC")) {
                     if (debug) System.out.println("FeederOnvistaLowMem: Schleife(" + i + "),Jahr(" + year + "),Umsatz(" + umsatz + "),Eigenkap(" + ekap + "),Gesamtkap(" + gkap + "),EBIT(" + ebit + "),JÜ(" + jue + ")");
-                        //DBOperations.dbInsertOnvistaBilanzData(conn, isin, wkn, aname, year, umsatz, ekap, gkap, ebit, jue);
+                    /*
+                    try {
+                        DBOperations.dbInsertOnvistaBilanzData(conn, isin, wkn, aname, year, umsatz, ekap, gkap, ebit, jue);
+                    } catch(SQLException e) {
+                        System.err.println(this.getClass().getName() + ": catchBilanzData: Z.200: " + e.getMessage() + " | " + e.getCause());
+                    }
+                    */
                 } else System.out.println("FeederOnvistaLowMem: Z.187: Hier könnte ein Insert-Befehl stehen.");
             }
         }

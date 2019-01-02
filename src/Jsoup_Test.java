@@ -51,8 +51,10 @@ public class Jsoup_Test {
         }
         */
         //ONVISTA
-        //FeederOnvistaLowMem fo = new FeederOnvistaLowMem(conn);
-        /*
+        Connection conn = new DBConnection().setupConnection();
+        FeederOnvistaLowMem fo = new FeederOnvistaLowMem(conn);
+
+        /* ArivaFX
         new Thread() {
             @Override
             public void run() {
@@ -64,7 +66,7 @@ public class Jsoup_Test {
         */
         //Hilfsmethoden.broodForce("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_","",8);
         //Hilfsmethoden.broodForce("abcdefghijklmnopqrstuvwxyz-_","",8);
-        Hilfsmethoden.broodForce("0123456789",0,8);
+        //Hilfsmethoden.broodForce("0123456789",0,8);
         //Onvista.catchBilanzData("https://www.onvista.de/aktien/SCHALTBAU-HOLDING-AG-Aktie-DE000A2NBTL2");
         /*
         ArrayList<String> arrOnvistaAktiennamen = fo.sendAktiennamen();
