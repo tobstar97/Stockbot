@@ -1,5 +1,8 @@
 package Hilfsklassen;
 
+import java.util.Date;
+import java.text.SimpleDateFormat;
+
 /**
  * @author andygschaider
  * @since poc
@@ -121,8 +124,9 @@ public class Hilfsmethoden {
     }
     
     
-    /**
+   /**
      * @author Lukas Meinzer
+     * @merge 2019-01-06
      * Log-Datei die überall aufrufbar ist
      * einem sagt in welcher Klasse und in welcher Methode sie aufgerufen wurde und zu welcher Zeit sie aufgerufen wurde
      * außerdem hat sie eine variierende Anzahl an Übergabeparametern
@@ -140,19 +144,9 @@ public class Hilfsmethoden {
 
         //sowie die Zeit rausfinden in der sie aufgerufen wurde:
         Date datum = new Date();
-        String date = datum.toString(); //aktuelle Zeit
-
-        //Anzahl an übergebenen Objekten (muss eine gerade Zahl sein):
-        //evtl. unnötig zu wissen
-        int i;
-        for(i=0;i<params.length;i++){
-            //System.out.println(params[i]);
-        }
-        //System.out.println(i);
-        //wenn i gerade ist steht es für das Attribut
-        //wenn i ungerade ist steht es für den Attributwert
-
-
+        //Format-Änderung der Datumsanzeige:
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        String date = simpleDateFormat.format(datum);
 
         //jetzt muss das ganze in eine txt-Datei gespeichert werden:
         BufferedWriter out;
@@ -162,7 +156,7 @@ public class Hilfsmethoden {
             out.newLine();
             out.write("Methodenname: "+methodenName);
             out.newLine();
-            out.write("Zeit: "+date);
+            out.write("Datum: "+date);
             out.newLine(); out.newLine();
             for(int j=0;j<params.length;j=j+2) {
                 out.write(params[j]);   //Attribut
