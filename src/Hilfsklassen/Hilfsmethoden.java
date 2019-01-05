@@ -119,5 +119,62 @@ public class Hilfsmethoden {
         f = f + s.substring(11);
         return f;
     }
+    
+    
+    /**
+     * @author Lukas Meinzer
+     * Log-Datei die überall aufrufbar ist
+     * einem sagt in welcher Klasse und in welcher Methode sie aufgerufen wurde und zu welcher Zeit sie aufgerufen wurde
+     * außerdem hat sie eine variierende Anzahl an Übergabeparametern
+     * Parameter werden wie folgt übergeben:
+     * "Attribut1","Wert1","Attribut2","Wert2",...
+     * die übergebenen Attribute sollen baumartig, jeweils paarweise unter den oben genannten Daten gespeichert werden
+     * das ganze soll in eine XML-Datei gespeichert werden und schön übersichtlich sein
+     */
+    public static void logdatei(String... params) {
+        //Methode, Klasse rausfinden in der sie aufgerufen wurde:
+        StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
+
+        String klassenname = stackTraceElement.getClassName(); //Klassenname
+        String methodenName = stackTraceElement.getMethodName(); //Methodenname
+
+        //sowie die Zeit rausfinden in der sie aufgerufen wurde:
+        Date datum = new Date();
+        String date = datum.toString(); //aktuelle Zeit
+
+        //Anzahl an übergebenen Objekten (muss eine gerade Zahl sein):
+        //evtl. unnötig zu wissen
+        int i;
+        for(i=0;i<params.length;i++){
+            //System.out.println(params[i]);
+        }
+        //System.out.println(i);
+        //wenn i gerade ist steht es für das Attribut
+        //wenn i ungerade ist steht es für den Attributwert
+
+
+
+        //jetzt muss das ganze in eine txt-Datei gespeichert werden:
+        BufferedWriter out;
+        try{
+            out = new BufferedWriter(new FileWriter("test.txt"));
+            out.write("Klassenname: "+klassenname);
+            out.newLine();
+            out.write("Methodenname: "+methodenName);
+            out.newLine();
+            out.write("Zeit: "+date);
+            out.newLine(); out.newLine();
+            for(int j=0;j<params.length;j=j+2) {
+                out.write(params[j]);   //Attribut
+                out.write("\t\t");  //Abstand
+                out.write(params[j + 1]); //Attributwert
+                out.newLine();          //neue Zeile
+            }
+            out.close();
+        } catch(IOException e){
+            System.err.println("Logdatei-Fehler");
+            e.printStackTrace();
+        }
+    }
 
 }
