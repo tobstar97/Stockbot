@@ -1,0 +1,45 @@
+-- Creates fuer Aktie
+
+
+CREATE TABLE Aktie (
+   AktieID int(10),
+   AktieISIN varchar(12), 
+   WKN int(10),
+   Aktienname varchar(67),
+   PRIMARY KEY (AktieID,AktieISIN),
+);
+ 
+CREATE TABLE Gewinn (
+   GewinnID int(10),
+   GewinnISIN varchar(12),
+   Jahr int(10),
+   Gewinn int(10),
+   EBIT int(10),
+   PRIMARY KEY (GewinnID,GewinnISIN),
+);
+
+CREATE TABLE Kapital (
+   KapitalID int(10),
+   KapitalISIN varchar(12),
+   Jahr int(10),
+   Eigenkapital int(10),
+   Gesamtkapital int(10),
+   PRIMARY KEY (KapitalID,KapitalISIN),
+);
+
+CREATE TABLE Umsatz (
+   UmsatzID int(10),
+   UmsatzISIN varchar(12),
+   Jahr int(10),
+   Umsatz int(10),
+   Analystenmeinung int(10),
+   PRIMARY KEY (UmsatzID,UmsatzISIN)
+);
+
+CREATE TABLE Kurs (
+   KursID int(10),
+   KursISIN varchar(12),
+   Datum int(10),
+   Kurs float,
+   PRIMARY KEY (KursID,KursISIN),
+);
