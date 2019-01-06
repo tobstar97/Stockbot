@@ -43,7 +43,7 @@ public class Jsoup_Test {
         //FeederMorningstar fm = new FeederMorningstar();
         //conn = new DBConnection().setupConnection();
         //ARIVA
-        /*
+/*
         FeederAriva fa = new FeederAriva();
         Set<String> set = fa.sendSetToAriva();
         ArrayList<String> arrAriva = new ArrayList<>();
@@ -52,12 +52,13 @@ public class Jsoup_Test {
         for(int i=0; i<arrAriva.size(); i++) {
             DBOperations.dbInsert(conn, String.valueOf(i), arrAriva.get(i), null, "Ariva");
         }
-        */
+*/
         //ONVISTA
-        Connection conn = new DBConnection().setupConnection();
-        FeederOnvistaLowMem fo = new FeederOnvistaLowMem(conn);
+        //Connection conn = new DBConnection().setupConnection();
+        //FeederOnvistaLowMem fo = new FeederOnvistaLowMem(conn);
 
-        /* ArivaFX
+/*
+        ArivaFX
         new Thread() {
             @Override
             public void run() {
@@ -66,19 +67,19 @@ public class Jsoup_Test {
         }.start();
         FeederArivaFX startUpTest = FeederArivaFX.waitForFeederArivaFX();
         startUpTest.printSomething();
-        */
+*/
         //Hilfsmethoden.broodForce("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_","",8);
         //Hilfsmethoden.broodForce("abcdefghijklmnopqrstuvwxyz-_","",8);
         //Hilfsmethoden.broodForce("0123456789",0,8);
         //Onvista.catchBilanzData("https://www.onvista.de/aktien/SCHALTBAU-HOLDING-AG-Aktie-DE000A2NBTL2");
-        /*
+/*
         ArrayList<String> arrOnvistaAktiennamen = fo.sendAktiennamen();
         ArrayList<String> arrOnvistaISINs = fo.sendISINs();
         System.out.println("Jsoup_Test: " + arrOnvistaAktiennamen + "\n" + arrOnvistaISINs);
         for(int i=0; i<arrOnvistaAktiennamen.size() && i<arrOnvistaISINs.size(); i++) {
             DBOperations.dbInsert(conn,arrOnvistaISINs.get(i),arrOnvistaAktiennamen.get(i),null,"Onvista");
         }
-        */
+*/
 
 //  --- --- -=- -=- -== -== === === Hauptklassen === === ==- ==- -=- -=- --- ---
 /*
@@ -108,8 +109,8 @@ public class Jsoup_Test {
         morning.connect();      //Alphabet Inc
         System.out.println("main:Morningstar: Gewinn Alphabet Inc: " + morning.getGewinn());
         System.out.println("main:Morningstar: Kurs Alphabet Inc: " + morning.getKurs());
-*/
-/*      HOTFIXING der Insert-Kommando-Parameter
+*//*
+        HOTFIXING der Insert-Kommando-Parameter
         String umsatzDaten = "-1 -2 -3 -4 -5";
         for(int i=0;i<5;i++) {
             String umsatz = "";
@@ -141,10 +142,9 @@ public class Jsoup_Test {
                 System.out.println("umsatzDaten(" + umsatzDaten + "),umsatz(" + umsatz + "),cnt("+cnt+")");
             }
         }
-*/
-
+*//*
         //Multiplier-Tests
-        /*
+
         Document doc = null;
         try {
             doc = Jsoup.connect("https://www.onvista.de/aktien/bilanz-guv/Amazon-Aktie-US0231351067").get();
@@ -167,7 +167,7 @@ public class Jsoup_Test {
         System.out.println("BilMeth: " + bilanzierungsmethode);
         System.out.println("Multipl: " + multiplier);
         System.out.println("Waehrun: " + waehrung);
-        */
+*/
     }
 
 }

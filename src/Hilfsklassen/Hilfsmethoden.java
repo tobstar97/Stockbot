@@ -1,5 +1,11 @@
 package Hilfsklassen;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * @author andygschaider
  * @version poc
@@ -151,7 +157,14 @@ public class Hilfsmethoden {
         return f;
     }
 
-    public static void broodForce(String alphabet, int start, int length) {
+    /**
+     * @author andygschaider
+     * Brute-Force-Head-Methode: genutzt, um JavaScript-Befehle im Quelltext zu finden und automatisch auszuführen.
+     * @param alphabet vordefiniertes Alphabet.
+     * @param start bei welcher Stringlänge soll angefangen werden? (0=Anfang)
+     * @param length wie lang ist die maximale Stringlänge?
+     */
+    public static void bruteForce(String alphabet, int start, int length) {
         long sum = 0;
         for(int i=1; i<=length; i++) {
             System.out.println("broodForce(" + i + "): " + (int) Math.pow(alphabet.length(),i) + " Lösungen.");
@@ -161,19 +174,60 @@ public class Hilfsmethoden {
         if(start<1) start = 1;
         if(start>length) start = length;
         for(int i=start-1; i < length; i++) {
-            broodForceInsinde(alphabet,"",i+1);
+            bruteForceInsinde(alphabet,"",i+1);
         }
     }
 
-    private static void broodForceInsinde(String alphabet, String result, int length) {
+    /**
+     * @author andygschaider
+     * Brute-Force-Child-Methode: genutzt, um JavaScript-Befehle im Quelltext zu finden und automatisch auszuführen.
+     * @param alphabet vordefiniertes Alphabet.
+     * @param result String des vorherigen Durchlaufs (rekursiv).
+     * @param length maximale Stringlänge.
+     */
+    private static void bruteForceInsinde(String alphabet, String result, int length) {
         char[] chararr = alphabet.toCharArray();
         if(result.length() < length) {
             for (int i = 0; i < chararr.length; i++) {
                 String temp = result;
                 temp += chararr[i];
                 if(debug) System.out.println("broodForce(" + temp + ")");
-                broodForceInsinde(alphabet, temp, length);
+                bruteForceInsinde(alphabet, temp, length);
             }
+        }
+    }
+
+    /**
+     * @author Lukas Meinzer
+     * Erzeugen und Schreiben in eine Log-Datei.
+     * Automatisches Loggen von Klasse und Methode aus der die Funktion aufgerufen wird, ebenso Zeit.
+     * @param params variierende Anzahl an Übergabeparametern, Verarbeitung paarweise in folgender Form: "Attribut1","Wert1","Attribut2","Wert2",...
+     */
+    public static void logdatei(String... params) {
+        StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
+        String klassenname = stackTraceElement.getClassName();
+        String methodenName = stackTraceElement.getMethodName();
+        Date datum = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy"); //Format-Änderung
+        String date = simpleDateFormat.format(datum);
+
+        //jetzt muss das ganze in eine txt-Datei gespeichert werden:
+        BufferedWriter out;
+        try{
+            out = new BufferedWriter(new FileWriter(date + ".log"));
+            out.write(date+": ");
+            out.write(klassenname+".");
+            out.write(methodenName+":");
+            for(int j=0;j<params.length;j=j+2) {
+                out.newLine();
+                out.write("\t");
+                out.write(params[j]+"(");   //Attribut
+                out.write(params[j+1]+")"); //Attributwert
+            }
+            out.close();
+        } catch(IOException e){
+            System.err.println("Hilfsklassen.Hilfsmethoden: logdatei(): Schreiben in Log nicht möglich!");
+            e.printStackTrace();
         }
     }
 
