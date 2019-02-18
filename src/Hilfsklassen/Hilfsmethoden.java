@@ -135,7 +135,10 @@ public class Hilfsmethoden {
      * die übergebenen Attribute sollen baumartig, jeweils paarweise unter den oben genannten Daten gespeichert werden
      * das ganze soll in eine XML-Datei gespeichert werden und schön übersichtlich sein
      */
-    public static void logdatei(String... params) {
+   public static void logdatei(String... params) {
+        //Wie soll die Log-Datei heißen?:
+        String logdateiName = "test.txt";
+
         //Methode, Klasse rausfinden in der sie aufgerufen wurde:
         StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
 
@@ -149,22 +152,22 @@ public class Hilfsmethoden {
         String date = simpleDateFormat.format(datum);
 
         //jetzt muss das ganze in eine txt-Datei gespeichert werden:
-        BufferedWriter out;
+        //("\r\n" sorgt für eine neue Zeile in der txt-Datei)
+        PrintWriter out;
         try{
-            out = new BufferedWriter(new FileWriter("test.txt"));
-            out.write("Klassenname: "+klassenname);
-            out.newLine();
-            out.write("Methodenname: "+methodenName);
-            out.newLine();
-            out.write("Datum: "+date);
-            out.newLine(); out.newLine();
+            out = new PrintWriter(new FileWriter(logdateiName,true));
+            out.append("Klassenname: "+klassenname+"\r\n");
+            out.append("Methodenname: "+methodenName+"\r\n");
+            out.append("Datum: "+date+"\r\n");
+            out.append("\r\n"); out.write("\r\n");
             for(int j=0;j<params.length;j=j+2) {
-                out.write(params[j]);   //Attribut
-                out.write("\t\t");  //Abstand
-                out.write(params[j + 1]); //Attributwert
-                out.newLine();          //neue Zeile
+                out.append(params[j]);   //Attribut
+                out.append("\t\t");  //Abstand
+                out.append(params[j + 1]); //Attributwert
+                out.append("\r\n");         //neue Zeile
             }
             out.close();
+            System.out.println("Log-Datei namens "+logdateiName+" erfolgreich erstellt.");
         } catch(IOException e){
             System.err.println("Logdatei-Fehler");
             e.printStackTrace();
