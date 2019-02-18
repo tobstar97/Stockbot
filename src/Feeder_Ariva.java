@@ -108,8 +108,12 @@ public class Feeder_Ariva {
         }
 
     }
-
-
+    
+    /**
+    *Liefert die Aktien aller Indizes
+    *manche Aktien sind doppelt gelistet (z.B. Apple)
+    *manche Indizes haben keine gelisteten Aktien
+    */
     public void aktie() throws IOException {
         int max = indizesliste.size();
         int i = 0;
