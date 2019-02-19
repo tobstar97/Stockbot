@@ -1,220 +1,205 @@
-package Feeder;
+package Ariva;
+/**
+ * @author Tobias Heiner
+ * @description Liefert die Links zu den einzelnen Aktien auf ariva.de
+ * @andi Lass bitte ALLE Kommentare stehen und füge nichts mit debug etc. hinzu (macht das Ganze nur viel unübersichtlicher)
+ * Intellij hat einen Debugger integriert -> man muss nirgendwo einen debugmodus hinzufügen
+ */
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.HashSet;
-import java.util.Set;
-
-import Datenbank.DBOperations;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-/**
- * Automatisches Abfragen von Aktiennamen von bekannten Indizes von ariva.
- * Klasse Ariva wird dann mit den Aktiennamen gefuettert und zieht die jeweiligen Daten aus dem Netz.
- *
- * Achtung: Erstellen einses Objekts dieser Klasse startet sofort den Fuetterungsvorgang!
- * Diese Klasse wird lediglich beim ersten Programmstart nach der Installation benoetigt.
- *
- * Das Array macht leichte Probleme, es werden ab und an einfach Indizes uebersprungen.
- * Workaround: Klasse einfach mehrfach hintereinander ausfuehren.
- *
- * Zeitaufwand fuer diese Klasse: ~7h
- *
- * @author andygschaider
- * @version poc
- * @since poc
- */
-public class FeederAriva {
+import java.io.IOException;
+import java.util.ArrayList;
 
-    //debug-Mode on?
-    private boolean debug = true;
+public class Feeder_Ariva {
 
-    private Set<String> set = new HashSet<>(3000);
-    private Set<String> iot = new HashSet<>(19);
-    private String[] arr = new String[19];
-
-    public FeederAriva() {
-        //alle Links zu Aktienindizes die nicht auf das unten in getIndizes() gelistete Schema matchen
-        iot.add("https://www.ariva.de/eurostoxx-50");
-        iot.add("https://www.ariva.de/aex");
-        iot.add("https://www.ariva.de/atx");
-        iot.add("https://www.ariva.de/cac40");
-        iot.add("https://www.ariva.de/ibex");
-        iot.add("https://www.ariva.de/smi");
-        iot.add("https://www.ariva.de/dow-jones-industrial-average");
-        iot.add("https://www.ariva.de/nikkei");
-        iot.add("https://www.ariva.de/hang-seng");
-        iot.add("https://www.ariva.de/dj_canada-index");
-        iot.add("https://www.ariva.de/tsx-60-index");
-        iot.add("https://www.ariva.de/mexican_bolsa-index");
-        iot.add("https://www.ariva.de/quote/profile.m?secu=674776");
-        iot.add("https://www.ariva.de/set_50-index");
-        iot.add("https://www.ariva.de/egx_30-index");
-        iot.add("https://www.ariva.de/ise_national_30-index");
-        iot.add("https://www.ariva.de/omx_kopenhagen_20_kurs-index");
-        iot.add("https://www.ariva.de/wbi_wiener_b%C3%B6rse_index");
-        iot.add("https://www.ariva.de/ptx_eur-index");
-
-        Object[] iotarray = iot.toArray();
-        for(int i=0;i<iotarray.length;i++) {
-            arr[i] = (String) iotarray[i];
-            arr[i] = arr[i].substring(20);
-            if(debug) System.out.println("FeederAriva():" + arr[i]);
-        }
-
-        //sobald ein Objekt dieser Klasse erstellt wird, wird automatisch losgefuettert.
-        try {
-            getIndizes();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    String url = "https://www.ariva.de/aktien/indizes";
+    Document doc;
+    ArrayList<String> indizesliste = new ArrayList<>();
+    ArrayList<String> aktienliste = new ArrayList<>();
 
     /**
-     * Holt die Links zu den Aktienindizes von Ariva.de
+     * Laedt Website herunter
      *
-     * Beim Erstellen eines Objekts dieser Klasse wird diese Methode einmalig aufgerufen,
-     * danach kann sie von aussen angesteuert und manuell gestartet werden.
-     *
-     * @author andygschaider
      * @throws IOException
      */
-    public void getIndizes() throws IOException {
-        String baseurl = "https://www.ariva.de/aktien/indizes";
-        Document doc = Jsoup.connect(baseurl).get();
-
-        System.out.println("Durchsuche Ariva.de nach gueltigen Aktienlinks. Dies kann einige Minuten dauern...");
-
-        for(int i=0; i<doc.select("a[href*=\"dax\"],a[href$=\"-index/kursliste\"],a[href=\"/quote/aktienkurse.m?list=\"],a[href=\"performance_index\"]").size(); i++) {
-            //fuer jeden Aktienindex die jeweiligen Aktien raussuchen und dann den Link zur Aktie weiterreichen
-            //matcht (liefert ca. 500 Aktienlinks):
-            //alles mit "dax" als bestandteil und
-            //alles mit "-index/kursliste" als ende
-            Element elem = doc.select("a[href*=\"dax\"],a[href$=\"-index/kursliste\"],a[href=\"/quote/aktienkurse.m?list=\"],a[href=\"performance_index\"]").get(i);
-            String url = elem.attr("href");
-            if(debug) System.out.println("getIndizes(): " + " https://www.ariva.de" + url);
-            getAndSendNames("https://www.ariva.de" + url);
-        }
-        if(debug) System.out.println("=============================================");
-        //jetzt noch alle Indizes, welche nicht auf den select matchen (liefert ca. 300 Aktienlinks)
-        for(int j=0; j<3; j++) {
-            for (int i = 0; i < arr.length - 1; i++) {
-                if (debug)
-                    System.out.println("getIndizes(): " + arr[i]);
-                getAndSendNames("https://www.ariva.de" + arr[i]);
-            }
-        }
-
-        //if(debug)
-        System.out.println(set);
-        //if(debug)
-        System.out.println(set.size());     //550 -> jetzt 800
+    public void connect() throws IOException {
+        doc = Jsoup.connect(url).get();
     }
 
     /**
-     * Holt die Links zu den Aktien eines Aktienindex von Ariva.de
-     * @author andygschaider
-     * @param res
+     * Waehlt die "Regionen" und fuehrt dann die Methode getIndizes aus
+     *
      * @throws IOException
      */
-    private void getAndSendNames(String res) throws IOException {
-        Document doc = Jsoup.connect(res).get();
-        //aus jedem Element den Link rausziehen
-        for(int i=0;i<doc.select("a[href$=\"-aktie\"]").size(); i++) {
-            Element elem = doc.select("a[href$=\"-aktie\"]").get(i);
-            String s = elem.attributes().toString();
-            //auf Link kuerzen
-            s = s.substring(8);
-            s = s.substring(0,s.length()-1);    //letztes Zeichen = '>' weg
-            if(debug) System.out.println("getAndSendNames(): " + s);
-            if(!set.contains(s)) {
-                set.add(s);
-            }
-        }
+    public void indizes() throws IOException {
+
+        connect();         //stelle Verbindung zur Website her
+        Element indextabelle = doc.select("#result_table_0 > tbody:nth-child(3)").first();         //gehe in die Tabelle dees Aktienindizes, z.B. Deutschland, Europa
+        getIndizes(indextabelle);
+
+        indextabelle = doc.select("#result_table_1 > tbody:nth-child(3)").first();        //Europa
+        getIndizes(indextabelle);
+
+        indextabelle = doc.select("#result_table_2 > tbody:nth-child(3)").first();         //Amerika
+        getIndizes(indextabelle);
+
+        indextabelle = doc.select("#result_table_3 > tbody:nth-child(3)").first();         //Welt
+        getIndizes(indextabelle);
+
     }
 
     /**
-     * Speichert alle gefundenen Links in einer Textdatei.
-     * Falls neue Links gefunden werden, werden sie hinzugefuegt.
-     * @author andygschaider
-     */
-    public Set<String> sendSetToAriva() {
-        //Uebermitteln des Sets an Klasse Ariva.java
-        if(debug) System.out.println("sendSetToAriva(): " + set.size());
-        return set;
-    }
-
-    /**
-     * @author andygschaider
-     * @description Versuch, die Suchseiten so zu durchlaufen wie die Indizes selbst
-     * @throws IOException
+     * liefert die Links zu den Indizes eine "Region
      *
-     * gescheitert.
+     * @param indextabelle "Region" z.B. Deutschland
      */
-    public static void getSucheIndizes() throws IOException {
-        String linkv = "https://www.ariva.de/aktien/suche#page=";
-        String linkh= "&year=_year_2017&sort_n=ariva_name&sort_d=asc";
-        //insgesamt 133 Seiten in der Suche
-        for(int i=0; i<133; i++) {
-            String link = linkv + i + linkh;
-            Document doc = Jsoup.connect(link).get();
-            for(int j=0; j<doc.select("a[href*=\"aktie\"]").size(); j++) {
-                Element elem = doc.select("a[href*=\"aktie\"]").get(j);
-                System.out.println(elem);
-            }
+    public void getIndizes(Element indextabelle) {
+
+        int groesse;          //Groesse der Tabelle
+        groesse = indextabelle.childNodeSize() - 1;         //-1 deswegen, um die unterste Zeile (Leerzeile) wegzurechnen
+
+        int i = 0;       //Zaehlvariable zum Durchlaufen der Tabelle
+        while (i < groesse) {           //Durchlaufen der Tabelle und Speicherung alller Links in der Arraylist indizesListe
+
+            Element index = indextabelle.child(i);        //Tabellenelement auswaehlen
+            Element meta = index.child(0).select("a").first();           //Weg zum href
+            String link = meta.attr("href");            //href bekommen; From: "/dax..."; kompletter Link -> "ariva.de" + link
+            link = indexlinkZusammensetzen(link);           //Link zusammenbauen
+            System.out.println(link);
+            indizesliste.add(link);         //Hinzufuegen des Links zur indizesListe
+            i++;
         }
     }
 
     /**
-     * @author andygschaider
-     * @description Versuch den Quelltext an sich auszulesen
-     * @param surl
-     * @return
+     * baut den Indexlink komplett zusammen
      *
-     * gescheitert
+     * @param l Linkbaustein(nur Ende)
+     * @return fertiger Link
      */
-    public static String getSeitenquelltext(String surl){
-        final String userAgent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.8.1.12) Gecko/20080201 Firefox/2.0.0.12";
-        try {
-            URL url = new URL(surl);
-            URLConnection conn = url.openConnection();
-            conn.addRequestProperty("User-Agent", userAgent);
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String str, str1;
-            str = new String();
-            while ((str1 = in.readLine()) != null) {
-                str = str + str1;
+    public String indexlinkZusammensetzen(String l) {
+        String result = "https://www.ariva.de" + l;           //Strings zusammensetzen
+        return result;
+    }
+
+
+    public int seitenanzahl(int k) throws IOException {
+
+
+        doc = Jsoup.connect(indizesliste.get(k)).get();
+
+        Element leiste = doc.getElementsByClass("pageNavigate").first();
+        if (leiste == null) {
+            return 0;
+        } else {
+            Element zahl = leiste.child(1);         //Seitenauswahlelement
+
+            Element t = zahl.getElementsByClass("prgLink").last();
+            String s = t.attr("data-submit");
+
+            int j;
+            j = s.indexOf("page");
+            s = s.substring(j + 5);
+            j = Integer.parseInt(s);
+            return j;
+        }
+
+    }
+    
+    /**
+    *Liefert die Aktien aller Indizes
+    *manche Aktien sind doppelt gelistet (z.B. Apple)
+    *manche Indizes haben keine gelisteten Aktien
+    */
+    public void aktie() throws IOException {
+        int max = indizesliste.size();
+        int i = 0;
+
+        while (i < max) {         //Index auswaehlen
+
+
+            doc = Jsoup.connect(indizesliste.get(i)).get();
+            int seiteMax = seitenanzahl(i);
+            String s = indizesliste.get(i);
+
+
+            Element test = doc.select("#result_table_0 > tbody:nth-child(3)").first();
+            if (test == null) {
+                System.out.println("Keine Aktien vorhanden");
+            } else {
+
+                if (max == 0) {         //wenn kein Seitenelement vorhanden ist
+                    doc = Jsoup.connect(s).get();
+                    int t;
+                    Element meta = doc.select("#result_table_0 > tbody:nth-child(3)").first();          //Tabelle auswaehlen
+                    t = meta.childNodeSize();           //Anzahl der Elemente rausfinden
+                    t = t - 1;
+                    //System.out.println(t);
+                    //s = indizesliste.get(i);
+                    int q = 0;
+
+
+                    while (q < t) {         //Elemente (Aktien) durchlaufen
+                        Element o = meta.child(q);
+                        //System.out.println(o.text());
+
+
+                        o = o.select("a").first();          //Link aus dem CSS-Selektor bekommen
+                        String result = o.attr("href");
+                        result = indexlinkZusammensetzen(result);
+                        System.out.println(result);
+
+                        aktienliste.add(result);
+                        q++;
+
+
+                    }
+                } else {
+
+                    int k = 0;
+
+                    while (k <= seiteMax) {         //wenn mehrere Seiten vorhanden sind
+                                                    //aequivalent wie oben
+                        s = s + "?page=" + k + "&sort_d=asc&sort=agname";
+                        doc = Jsoup.connect(s).get();
+                        int t;
+                        Element meta = doc.select("#result_table_0 > tbody:nth-child(3)").first();
+                        t = meta.childNodeSize();
+                        t = t - 1;
+                        //System.out.println(t);
+                        s = indizesliste.get(i);
+                        k++;
+                        int q = 0;
+                        while (q < t) {
+                            Element o = meta.child(q);
+                            //System.out.println(o.text());
+
+
+                            o = o.select("a").first();
+                            String result = o.attr("href");
+                            result = indexlinkZusammensetzen(result);
+                            System.out.println(result);
+                            aktienliste.add(result);
+                            q++;
+
+
+                        }
+                    }
+
+
+                }
+
+
             }
-            in.close();
-            return str;
-        } catch (MalformedURLException e) {
-            System.out.println( e.getMessage());
-            return "catch1";
-        } catch (IOException e) {
-            System.out.println( e.getMessage());
-            return "catch2";
+            i++;
         }
     }
 
-    /**
-     * @author andygchaider
-     * @description Versuch, das JavaScript auszulesen
-     */
-    public static void readJavaScript() {
-        WebView webView = new WebView();
-        final WebEngine webEngine = webView.getEngine();
-        webEngine.load("https://www.ariva.de/aktien/suche#page=0&year=_year_2017&sort_n=ariva_name&sort_d=asc");
-        org.w3c.dom.Document doc = webEngine.getDocument();
-        System.out.println(webEngine.getTitle());
+    public void ausgabe() {
+        System.out.println(aktienliste.size());
     }
 
 }
