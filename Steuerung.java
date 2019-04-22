@@ -1,4 +1,4 @@
-import Ariva.Ariva_Kurs;
+import Ariva.Ariva_Kurs_CSV;
 import Ariva.Feeder_Ariva;
 
 
@@ -10,7 +10,8 @@ public class Steuerung{
     public void feeder() {
 
         Feeder_Ariva fa = new Feeder_Ariva();
-        Ariva_Kurs a = new Ariva_Kurs();
+
+        Ariva_Kurs_CSV acsv = new Ariva_Kurs_CSV();
 
 
 
@@ -35,9 +36,8 @@ public class Steuerung{
             Iterator it = x.iterator();
             while (it.hasNext()){
                 String setText = (String) it.next();
-                a.kursLink(a.ablauf(setText));
-                a.getKursGesamt();
-                a.aus();
+                acsv.kurs_csv_link(setText);
+
             }
 
         }catch (Exception e){
