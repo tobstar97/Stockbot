@@ -12,29 +12,19 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.UnknownHostException;
 
 import java.net.URL;
 
 import java.io.*;
-import java.io.IOException;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
-import java.util.Scanner;
 
 
 public class Ariva_Kurs_CSV {
 
     Document doc;
-
-
-
 
 
     /**
@@ -53,17 +43,30 @@ public class Ariva_Kurs_CSV {
     }
 
 
-
-
-
     /**
      * lädt die CSV-Datei des kompletten historischen Kurses runter
      * Schwierigkeit: Linkzusammensetzung automatisieren
+     *
      * @param link: URL der Aktie (bekommt man von Feeder_Ariva) -> Steuerungsklasse
      * @return fertiger CSV-Download-Link
      */
-    public void kurs_csv_link(String link)throws IOException{
-        link = link + "/historische_kurse";         //Link aus Ariva_Feeder zusammensetzen
+    public void kurs_csv_link(String link) throws IOException {
+        //Problem: es gibt einige Aktienlinks die anders aufgebaut sind
+
+        if (link.contains("https://www.ariva.de/quote/profile")) {
+            link = link.replace("profile", "historic");
+            //@Lukas hier
+            System.out.println(link);
+
+        } else if (link.contains("https://www.ariva.de/anleihen")) {
+            //@Lukas hier
+            link = link.replace("anleihen/profil", "quote/historic");
+
+        } else {
+            //@Lukas hier
+            link = link + "/historische_kurse";         //Link aus Ariva_Feeder zusammensetzen
+        }
+
         doc = Jsoup.connect(link).get();            //html-Dokument downloaden
         Element secu = doc.select("div.formRow:nth-child(4) > form:nth-child(2) > input:nth-child(1)").first();            //"secu"-Element auswaehlen und in secu speichern
         String secu_s = secu.val();             //value des CSS-Elements als String in secu_s
@@ -80,14 +83,14 @@ public class Ariva_Kurs_CSV {
         i = i.replace("ISIN: ", "");
         i = i + ".csv";
 
-        File targetDir=new File("CSV-Daten");
-        File targetFile=new File(targetDir, i);
+        File targetDir = new File("CSV-Daten");
+        File targetFile = new File(targetDir, i);
 
         System.out.println(i);
 
         //Download der CSV-Datei
         try (BufferedInputStream inputStream = new BufferedInputStream(new URL(csv_down).openStream());
-             FileOutputStream fileOS = new FileOutputStream(targetFile)) {
+             FileOutputStream fileOS = new FileOutputStream(targetFile)) {          //die Daten werden in ein CSV-File gespeichert; Name des Files: ISIN
             byte data[] = new byte[1024];
             int byteContent;
             while ((byteContent = inputStream.read(data, 0, 1024)) != -1) {
@@ -95,15 +98,15 @@ public class Ariva_Kurs_CSV {
             }
         } catch (IOException e) {
             // handles IO exceptions
+            System.err.println(e);
         }
     }
 
 
     /**
-     *
      * @return aktuelles Datum als String
      */
-    public String aktuelles_datum(){
+    public String aktuelles_datum() {
         Date d = new Date();
         DateFormat df;
         df = DateFormat.getDateInstance(DateFormat.MEDIUM);
@@ -111,6 +114,19 @@ public class Ariva_Kurs_CSV {
         //System.out.println(datum);
         return datum;
     }
+
+    /**
+     * @Lukas hier die Anleitung
+     * hier muss einen Methode hin, die die Waehrung des Kurses einer Aktie besimmt
+     * am einfachsten ist es, wenn du die Methoden in der kurs_csv_link Methode aufrufst ( direkt nach dem Zumassemsetzen des links zu den historischen Kursen (hab es dir markiert)
+     * "Anleitung": lies am besten einfach den letzten Schlusswert einer Aktie aus (z.b. https://www.ariva.de/amazon-aktie/historische_kurse
+     * da steht dann die Waehrung hhinten
+     * und nun zur komplizierteren Sache: du musst es irgendwie schaffen, dass du die CSV-Daten + die Währung in die Datenbank bekommst
+     * die dürfen halt nicht durchgemischt sein (also z.b. amazon mit Euro, Lufthansa mit Pfund usw.)
+     * Viel Spaß!!!
+     */
+
+
 
 
 }
