@@ -11,6 +11,7 @@ import java.util.Scanner;
  * @ziel: wie beim letzten Treffen mit Herrn Lehner besprochen: Werte aller DAX_Konzerne und ein paar internationale Aktien von ariva holen und in eine Datenbank speichern
  * @fehlt_noch: wir müssen noh die Währung des Kurses einer AKtie bekommen (kein großer Aufwand @Lukas); dazu einfach eine Methode in die Ariva_kurs_CSV schreiben)
  * hab dir da schon mal eine kleine Anleitung reingeschrieben (ganz unten)
+ * Parser für die CSV-Daten (@Lukas)
  */
 
 public class Main {
