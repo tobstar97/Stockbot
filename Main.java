@@ -1,3 +1,4 @@
+import Ariva.Ariva_Bilanz;
 import Ariva.Ariva_Kurs_CSV;
 
 import java.util.ArrayList;
@@ -17,6 +18,17 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
+
+        //Test auf Funktionalität von Ariva_Bilanz
+        Ariva_Bilanz b = new Ariva_Bilanz();
+        try{
+            b.bianz("https://www.ariva.de/spotify-aktie");
+
+        }catch (Exception e){
+            System.out.println(e);
+        }
+        System.exit(-1);
+
         //Test auf Funktionalität von Ariva_Kurs_CSV
         Ariva_Kurs_CSV acsv = new Ariva_Kurs_CSV();
         System.out.println("Download der CSV-Daten aller Aktien auf ariva.de?       -> 1");
