@@ -181,6 +181,8 @@ public class Ariva_Bilanz {
 
     /**
      * Test, ob ein Element null ist
+     * Ausserdem wird der string Formatisiert
+     * Zielform: z.B.: 2.5000000 oder 57.7 entspricht in der deutschen Sprachgewohnheit 57,7
      * @param e Element (z.B. umsatz1)
      * @return entweder  "-" oder den Text des Elements
      */
@@ -189,7 +191,16 @@ public class Ariva_Bilanz {
             return "-";
 
         }else{
-            return e.text();
+            String r = e.text();
+            if(e.text().contains("M")){
+                r = r.replace("M","000");        //fuer ganz grosse Werte wird ein M dahintergeschrieben( M =: Milliarden)
+            }
+            if(r.contains(".")){
+                r = r.replace(".", "");
+                r = r + "000000";       //Bilanzsumme immer in Millionen
+            }
+            return r;
+
         }
     }
 
