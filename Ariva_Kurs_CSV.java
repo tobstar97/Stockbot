@@ -126,6 +126,32 @@ public class Ariva_Kurs_CSV {
      * Viel Spaß!!!
      */
 
+       /**
+     * @author Lukas Meinzer
+     * @param link (In welcher Form wird der hier uebergeben? --> muss man dann evtl noch anpassen)
+     * @return Waehrung als String
+     * @throws IOException
+     */
+    public String bestimme_waehrung(String link) throws IOException{
+        //Bestimme die Waehrung eines Kurses:
+        try {
+            doc = Jsoup.connect(link).get();
+        } catch (IOException e) {
+            System.err.println("Probleme bei der Link-Eingabe");
+        }
+            Element e = doc.getElementsByClass("font-size-14 left nobr  colloss").get(0);
+            String test = e.toString();
+            if (test.contains("$")){
+                return "$";
+            }
+            if (test.contains("€")){
+                return "€";
+            }
+            if(test.contains("£")){
+                return "£";
+            }
+        return "";
+    }
 
 
 
