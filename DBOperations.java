@@ -1,9 +1,6 @@
 package Datenbank;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.DateFormat;
 
 /**
@@ -82,6 +79,20 @@ public class DBOperations {
         }
     }
 
+    /**
+     * insert in die Bilanz Tabelle
+     * @param conn
+     * @param ISIN
+     * @param jahr
+     * @param umsatz
+     * @param analystenmeinung
+     * @param gewinn
+     * @param ebit
+     * @param eigenkapital
+     * @param fremdkapital
+     * @param waehrung
+     * @param letztesUpdate
+     */
     public void bilanz_insert(Connection conn, String ISIN, int jahr, double umsatz, String analystenmeinung, double gewinn, double ebit, double eigenkapital, double fremdkapital, String waehrung, String letztesUpdate){
         String query = "INSERT INTO Bilanz ("
                 +"ISIN,"
@@ -114,6 +125,66 @@ public class DBOperations {
         }catch (Exception e){
             System.out.println(e);
         }
+
+
     }
 
+    /**
+     * insert in die Index Tabelle
+     * @param conn
+     * @param isin
+     * @param wkn
+     * @param indexname
+     * @param land
+     */
+    public void index_insert(Connection conn, String isin, int wkn, String indexname, String land){
+        String query = "INSERT INTO Index("
+                + "ISIN,"
+                + "WKN,"
+                + "Indexname,"
+                + " Land) VALUES("
+                + "?, ?, ?, ?)";
+
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, isin);
+            pstmt.setInt(2, wkn);
+            pstmt.setString(3, indexname);
+            pstmt.setString(4, land);
+        }catch (Exception e){
+            System.out.println(e);
+        }
+
+
+    }
+
+
+    /**
+     * Test-select, um Datenbankinhalt zu prüfen
+     * @param conn
+     * @param isin
+     * @throws SQLException
+     */
+    public void aktie_select(Connection conn, String isin) throws SQLException{
+        Statement stmt = conn.createStatement();
+
+        String query = "SELECT * FROM Aktie WHERE ISIN = '" + isin + "'";
+        ResultSet rs = stmt.executeQuery("SELECT * FROM Aktie WHERE ISIN = ");
+
+        while (rs.next()){
+            System.out.println(rs.getNString("Aktienname"));
+            System.out.println(rs.getNString("ISIN"));
+        }
+
+    }
+
+
+    public void kurs_select(){
+
+    }
+
+
+    public void bilanz_select(){
+
+    }
 }
