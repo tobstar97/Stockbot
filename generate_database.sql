@@ -11,17 +11,16 @@ create table aktie
 
 create table bilanz
 (
-    ISIN             varchar(12)  not null
+    ISIN          varchar(12)  not null
         primary key,
-    Jahr             int          null,
-    Umsatz           double       null,
-    Analystenmeinung varchar(255) null,
-    Gewinn           double       null,
-    EBIT             double       null,
-    Eigenkapital     double       null,
-    Fremdkapital     double       null,
-    Waehrung         varchar(255) null,
-    letztesUpdate    timestamp    null,
+    Jahr          int          null,
+    Umsatz        double       null,
+    Gewinn        double       null,
+    EBIT          double       null,
+    Eigenkapital  double       null,
+    Fremdkapital  double       null,
+    Waehrung      varchar(255) null,
+    letztesUpdate varchar(255) null,
     constraint bilanz_aktie_ISIN_fk
         foreign key (ISIN) references aktie (ISIN)
 );
@@ -42,7 +41,7 @@ create table kurs
     Datum         time         null,
     Kurs          double       null,
     Waehrung      varchar(255) null,
-    letztesUpdate timestamp    null,
+    letztesUpdate varchar(255) null,
     constraint kurs_aktie_ISIN_fk
         foreign key (ISIN) references aktie (ISIN)
 );
