@@ -1,6 +1,5 @@
 create table aktie
 (
-    ID         int(10)      null,
     ISIN       varchar(12)  not null
         primary key,
     WKN        int(6)       null,
@@ -12,10 +11,9 @@ create table aktie
 
 create table bilanz
 (
-    ID               int(10)      null,
     ISIN             varchar(12)  not null
         primary key,
-    Jahr             time         null,
+    Jahr             int          null,
     Umsatz           double       null,
     Analystenmeinung varchar(255) null,
     Gewinn           double       null,
@@ -30,7 +28,6 @@ create table bilanz
 
 create table `index`
 (
-    ID        int(10)      null,
     ISIN      varchar(12)  not null
         primary key,
     WKN       int(6)       null,
@@ -40,7 +37,6 @@ create table `index`
 
 create table kurs
 (
-    ID            int(10)      null,
     ISIN          varchar(12)  not null
         primary key,
     Datum         time         null,
