@@ -18,25 +18,24 @@ public class DBOperations {
      * @param Branche
      * @param aktienname
      * @param aktienlink
-     * @param index
      */
-    public void aktien_insert(Connection conn, String ISIN, int WKN, String Branche, String aktienname, String aktienlink, String index){
-        String query = "INSERT INTO Aktie("
+    public void aktien_insert(Connection conn, String ISIN, String WKN, String Branche, String aktienname, String aktienlink){
+        String query = "INSERT INTO aktie("
                 + "ISIN,"
                 + "WKN,"
                 + "Branche,"
                 + "Aktienname,"
-                + "Aktienlink,"
-                + "Index) VALUES("
-                + "?, ?, ?, ?, ?, ?)";
+                + "Aktienlink) VALUES("
+                + "?, ?, ?, ?, ?)";
+        System.out.println(query);
         try{
             PreparedStatement pstmt = conn.prepareStatement(query);
             pstmt.setString(1,ISIN);
-            pstmt.setInt(2, WKN);
+            pstmt.setString(2, WKN);
             pstmt.setString(3, Branche);
             pstmt.setString(4,aktienname);
             pstmt.setString(5, aktienlink);
-            pstmt.setString(6, index);
+            //pstmt.setString(6, index);
 
             // execute the Statement
             pstmt.executeUpdate();
@@ -57,7 +56,7 @@ public class DBOperations {
      * @param letztesUpdate
      */
     public void kurs_insert(Connection conn, String ISIN, String datum, double kurs, String waehrung, String letztesUpdate){
-        String query = "INSERT INTO Kurs("
+        String query = "INSERT INTO kurs("
                 + "ISIN,"
                 + "Datum,"
                 + "Kurs,"
@@ -85,7 +84,6 @@ public class DBOperations {
      * @param ISIN
      * @param jahr
      * @param umsatz
-     * @param analystenmeinung
      * @param gewinn
      * @param ebit
      * @param eigenkapital
@@ -93,31 +91,29 @@ public class DBOperations {
      * @param waehrung
      * @param letztesUpdate
      */
-    public void bilanz_insert(Connection conn, String ISIN, int jahr, double umsatz, String analystenmeinung, double gewinn, double ebit, double eigenkapital, double fremdkapital, String waehrung, String letztesUpdate){
-        String query = "INSERT INTO Bilanz ("
+    public void bilanz_insert(Connection conn, String ISIN, int jahr, double umsatz, double gewinn, double ebit, double eigenkapital, double fremdkapital, String waehrung, String letztesUpdate){
+        String query = "INSERT INTO bilanz ("
                 +"ISIN,"
                 +"Jahr,"
                 +"Umsatz,"
-                +"Analystenmeinung,"
                 +"Gewinn,"
                 +"EBIT,"
-                +"Eihgenkapital,"
+                +"Eigenkapital,"
                 +"Fremdkapital,"
                 +"Waehrung,"
                 +"letztesUpdate) VALUES("
-                +"?,?,?,?,?,?,?,?,?,?)";
+                +"?,?,?,?,?,?,?,?,?)";
         try {
             PreparedStatement ptsmt = conn.prepareCall(query);
             ptsmt.setString(1, ISIN);
             ptsmt.setInt(2, jahr);
             ptsmt.setDouble(3, umsatz);
-            ptsmt.setString(4, analystenmeinung);
-            ptsmt.setDouble(5, gewinn);
-            ptsmt.setDouble(6, ebit);
-            ptsmt.setDouble(7, eigenkapital);
-            ptsmt.setDouble(8, fremdkapital);
-            ptsmt.setString(9, waehrung);
-            ptsmt.setTimestamp(10, Timestamp.valueOf(letztesUpdate));
+            ptsmt.setDouble(4, gewinn);
+            ptsmt.setDouble(5, ebit);
+            ptsmt.setDouble(6, eigenkapital);
+            ptsmt.setDouble(7, fremdkapital);
+            ptsmt.setString(8, waehrung);
+            ptsmt.setString(9, letztesUpdate);
 
             ptsmt.executeUpdate();
             ptsmt.close();
@@ -138,7 +134,7 @@ public class DBOperations {
      * @param land
      */
     public void index_insert(Connection conn, String isin, int wkn, String indexname, String land){
-        String query = "INSERT INTO Index("
+        String query = "INSERT INTO index("
                 + "ISIN,"
                 + "WKN,"
                 + "Indexname,"
@@ -169,7 +165,7 @@ public class DBOperations {
         Statement stmt = conn.createStatement();
 
         String query = "SELECT * FROM Aktie WHERE ISIN = '" + isin + "'";
-        ResultSet rs = stmt.executeQuery("SELECT * FROM Aktie WHERE ISIN = ");
+        ResultSet rs = stmt.executeQuery("SELECT * FROM Aktie WHERE ISIN =");
 
         while (rs.next()){
             System.out.println(rs.getNString("Aktienname"));
