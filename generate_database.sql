@@ -5,8 +5,7 @@ create table aktie
     WKN        int(6)       null,
     Branche    varchar(255) null,
     Aktienname varchar(255) null,
-    Aktienlink varchar(255) null,
-    `Index`    varchar(255) null
+    Aktienlink varchar(255) null
 );
 
 create table bilanz
