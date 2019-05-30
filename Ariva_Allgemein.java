@@ -1,4 +1,9 @@
 package Ariva;
+/**
+ * @author Tobias Heiner
+ * liefert die allgemeinnen Daten zu den Aktien auf ariva.de
+ * Daten werden in die Tabelle aktie eingefügt
+ */
 
 import Datenbank.DBConnection;
 import Datenbank.DBOperations;
@@ -8,6 +13,7 @@ import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public class Ariva_Allgemein {
 
@@ -35,8 +41,11 @@ public class Ariva_Allgemein {
 
 
         //Insert in die Tabelle aktie der Datenbank
-        dbop.aktien_insert(conn, isin, wkn, branche, aktienname, url);
-
+        try {
+            dbop.aktien_insert(conn, isin, wkn, branche, aktienname, url);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
 
     }
