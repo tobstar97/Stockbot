@@ -6,8 +6,13 @@ package Ariva;
  * @description downloadet ein CSV-File mit allen historischen Kursdaten einer Aktie auf ariva.de
  * @verbindung um das Programm automatisiert ablaufen zu lassen, muss die Methode kurs_csv_link automatisch links
  *              von der Feeder_Ariva Klasse bekommen -> siehe Steuerung-Klasse
+ *
+ * @anleitung: Objekt der Klasse Ariva_Kurs_CSV erstellen und die Methode csv-parser starten
+ * diese bekommt einfach nen Aktienlink übergeben (z.B. aus dem Feeder oder der Aktienliste für Herr Lehner)
  */
 
+import Datenbank.DBConnection;
+import Datenbank.DBOperations;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,7 +22,10 @@ import java.io.IOException;
 import java.net.URL;
 
 import java.io.*;
+import java.sql.Connection;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -25,6 +33,26 @@ import java.util.Date;
 public class Ariva_Kurs_CSV {
 
     Document doc;
+    ArrayList<String> arrayList = new ArrayList<>();
+    String waehrungslink;
+    String i;
+    String isin_s;
+    String letztesUpdate;
+
+
+    DBConnection dbcon = new DBConnection();
+    Connection conn;
+
+    DBOperations dbop = new DBOperations();
+
+    {
+        try {
+            conn = dbcon.setupConnection("root", "tobstar");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     /**
@@ -55,7 +83,7 @@ public class Ariva_Kurs_CSV {
 
         if (link.contains("https://www.ariva.de/quote/profile")) {
             link = link.replace("profile", "historic");
-            //@Lukas hier
+
             System.out.println(link);
 
         } else if (link.contains("https://www.ariva.de/anleihen")) {
@@ -72,6 +100,17 @@ public class Ariva_Kurs_CSV {
         String secu_s = secu.val();             //value des CSS-Elements als String in secu_s
         Element boerse_id = doc.select("div.formRow:nth-child(4) > form:nth-child(2) > input:nth-child(2)").first();            //"boerse_id"-Element auswaehlen
         String boerse_id_s = boerse_id.val();           //value des CSS-Elements als String in boerse_id_s
+
+
+        //Waehrung des Kurses herausfinden und in der Arraylist speichern
+        waehrungslink = link + boerse_id_s;
+
+
+
+
+
+
+
         //Downloadlink zusammensetzen
         String csv_down = "https://www.ariva.de/quote/historic/historic.csv?secu=" + secu_s + "&boerse_id=" + boerse_id_s + "&clean_split=1&clean_payout=0&clean_bezug=1&min_time=01.01.90&max_time=" + aktuelles_datum() + "&trenner=%3B&go=Download[HTTP/2.0";
         System.out.println(csv_down);
@@ -79,9 +118,12 @@ public class Ariva_Kurs_CSV {
         //Benennung der CSV-Datei mit der ISIN der Aktie; Speicherung in Ordner CSV-Daten
         //mein Verzeichnis sieht folgendermaßen aus: Ariva_Test > .idea, CSV-Daten, out,  src(> Main, Steuerung, ..)
         Element isin = doc.select(".verlauf > div:nth-child(2)").first();
-        String i = isin.text();
+        i = isin.text();
+        isin_s = isin.text();
         i = i.replace("ISIN: ", "");
         i = i + ".csv";
+
+        arrayList.add(i);
 
         File targetDir = new File("CSV-Daten");
         File targetFile = new File(targetDir, i);
@@ -125,8 +167,7 @@ public class Ariva_Kurs_CSV {
      * die dürfen halt nicht durchgemischt sein (also z.b. amazon mit Euro, Lufthansa mit Pfund usw.)
      * Viel Spaß!!!
      */
-
-       /**
+    /**
      * @author Lukas Meinzer
      * @param link (In welcher Form wird der hier uebergeben? --> muss man dann evtl noch anpassen)
      * @return Waehrung als String
@@ -139,20 +180,51 @@ public class Ariva_Kurs_CSV {
         } catch (IOException e) {
             System.err.println("Probleme bei der Link-Eingabe");
         }
-            Element e = doc.getElementsByClass("font-size-14 left nobr  colloss").get(0);
-            String test = e.toString();
-            if (test.contains("$")){
-                return "$";
-            }
-            if (test.contains("€")){
-                return "€";
-            }
-            if(test.contains("£")){
-                return "£";
-            }
+        Element e = doc.getElementsByClass("#pageHistoricQuotes > div.column.twothirds > div > table > tbody > tr:nth-child(3) > td.font-size-14.left.nobr.colwin").first();
+        String test = e.toString();
+        if (test.contains("$")){
+            return "USD";
+        }
+        if (test.contains("€")){
+            return "EUR";
+        }
+        if(test.contains("£")){
+            return "GBP";
+        }
         return "";
     }
 
+
+
+
+    public void csv_parser(String link)throws IOException{
+
+        kurs_csv_link(link);
+        String w = bestimme_waehrung(waehrungslink);
+        Ariva_CSV_Parser ariva_csv_parser = new Ariva_CSV_Parser();
+        try {
+            ariva_csv_parser.test(i);
+            for(String datum : ariva_csv_parser.hm.keySet()){
+                double kurs = ariva_csv_parser.hm.get(datum);
+                letztesUpdate = get_datum();
+                dbop.kurs_insert(conn, isin_s, datum, kurs, w, letztesUpdate);
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
+
+    }
+
+    public String get_datum(){
+        Date date = java.util.Calendar.getInstance().getTime();
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
+        String dateString = dateFormatter.format(date);
+        return dateString;
+    }
 
 
 }
