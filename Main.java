@@ -1,6 +1,12 @@
+import Ariva.Ariva_Allgemein;
 import Ariva.Ariva_Bilanz;
 import Ariva.Ariva_Kurs_CSV;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.DocumentType;
+import org.jsoup.nodes.Element;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Scanner;
@@ -15,22 +21,68 @@ import java.util.Scanner;
  * Parser für die CSV-Daten (@Lukas)
  */
 
+
+/**     ++++        ++++        ++++        ++++        ++++        ++++        ++++        ++++        ++++        ++++
+ *      +    ANLEITUNG:                                                                                                +
+ *      +    um Lehners Aufgabe zu erfüllen:                                                                           +
+ *      +    Man benötigt 3 Klassen: Ariva_Allgemein, Ariva_Bilanz, Ariva_Kurs_CSV                                     +
+ *      +    Erzeuge jeweils ein Objekt dieser Klassen                                                                 +
+ *      +    am einfachsten ist es, wenn man diese 3 Klassen in der Methode aktienListe() anlegt                       +
+ *      +    dann die ganzen vorherigen Statements in der main auskommentieren                                         +
+ *      +    Wenn man dann gefragt wird, welche Option man wählen will: nimm Option 3!!                                +
+ *      +    Viel Spaß!!!                                                                                              +
+ *      +    Bei Fehlern und Anmerkungen bitte mir (Tobias Heiner) Bescheid geben!                                     +
+ *      +    Ach ja: alle Rechtschreibfehler sind so gewollt und gehören zum Gesamtkunstwerk                           +
+ *      ++++        ++++        ++++        ++++        ++++        ++++        ++++        ++++        ++++        ++++
+ * */
 public class Main {
 
-    public static void main(String[] args) {
-
-        //Test auf Funktionalität von Ariva_Bilanz
-        Ariva_Bilanz b = new Ariva_Bilanz();
-        try{
-            b.bianz("https://www.ariva.de/spotify-aktie");
-
+    public static void main(String[] args)throws IOException {
+        /*
+        Ariva_Bilanz ab = new Ariva_Bilanz();
+        try {
+            ab.getdata2("https://www.ariva.de/spotify-aktie/bilanz-guv");
         }catch (Exception e){
-            System.out.println(e);
+
         }
-        System.exit(-1);
+        System.exit(123);*/
+
+
+        /*
+        Document doc = Jsoup.connect("https://www.ariva.de/spotify-aktie/bilanz-guv").get();
+        Element e = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(22) > td:nth-child(1)").last();
+        System.out.println(e.text());
+        if(e.text().contains("Summe kurzfristiges Fremdkapital")){
+            Element f = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(24) > td:nth-child(2)").first();
+            System.out.println(f.text());
+        }
+        else {
+            Element f = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(17) > td:nth-child(2)").first();
+        }*/
+        //System.exit(-1);
+
+
 
         //Test auf Funktionalität von Ariva_Kurs_CSV
         Ariva_Kurs_CSV acsv = new Ariva_Kurs_CSV();
+
+        //Test auf Bilanz und Datenbankeintrag
+        Ariva_Bilanz ariva_bilanz = new Ariva_Bilanz();
+
+        //Test der Ariva_Allgemein
+        Ariva_Allgemein ag = new Ariva_Allgemein();
+
+        try {
+
+            ag.getInfo("https://www.ariva.de/spotify-aktie");
+            ariva_bilanz.bilanz("https://www.ariva.de/spotify-aktie");
+            ag.getInfo("https://www.ariva.de/allianz-aktie");
+            ariva_bilanz.bilanz("https://www.ariva.de/allianz-aktie/bilanz-gu");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.exit(100);
+
         System.out.println("Download der CSV-Daten aller Aktien auf ariva.de?       -> 1");
         System.out.println("Download einer einzelnen CSV-Datei einer beliebigen Aktie?      ->2");
         System.out.println("Download einer Aktienliste (von Herr Lehner empfohlen)      ->3");
@@ -81,7 +133,11 @@ public class Main {
      */
     public static void aktienliste(){
 
-        Ariva_Kurs_CSV acsv = new Ariva_Kurs_CSV();
+        Ariva_Kurs_CSV ariva_kurs_csv = new Ariva_Kurs_CSV();
+        Ariva_Allgemein ariva_allgemein = new Ariva_Allgemein();
+        Ariva_Bilanz ariva_bilanz = new Ariva_Bilanz();
+
+
         ArrayList<String> liste = new ArrayList<>();
         liste.add("https://www.ariva.de/adidas-aktie");
         liste.add("https://www.ariva.de/allianz-aktie");
@@ -128,7 +184,10 @@ public class Main {
         while (it.hasNext()){
             String s = (String) it.next();
             try {
-                acsv.kurs_csv_link(s);
+                //acsv.kurs_csv_link(s);
+                ariva_allgemein.getInfo(s);
+                ariva_bilanz.bilanz(s);
+
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -139,3 +198,4 @@ public class Main {
 
 
 }
+
