@@ -1,10 +1,17 @@
 package Ariva;
 
+import Datenbank.DBConnection;
+import Datenbank.DBOperations;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author Tobias Heiner
@@ -12,6 +19,19 @@ import java.io.IOException;
  */
 public class Ariva_Bilanz {
     Document doc;
+    DBConnection dbcon = new DBConnection();
+    Connection conn;
+
+
+    DBOperations dbop = new DBOperations();
+
+    {
+        try {
+            conn = dbcon.setupConnection("root", "tobstar");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
     /**
@@ -19,7 +39,7 @@ public class Ariva_Bilanz {
      *
      * @param link URL einer Aktie auf ariva.de
      */
-    public void bianz(String link) throws IOException {
+    public void bilanz(String link) throws IOException {
         //Problem: es gibt einige Aktienlinks die anders aufgebaut sind
 
         if (link.contains("https://www.ariva.de/quote/profile")) {
@@ -34,6 +54,10 @@ public class Ariva_Bilanz {
 
 
         doc = Jsoup.connect(link).get();
+
+
+
+
         Element pagenode = doc.select("#pageFundamental > div:nth-child(3) > form:nth-child(1) > select:nth-child(2)").first();
         int page = pagenode.childNodeSize();
         page = (page / 2) - 1;
@@ -44,7 +68,7 @@ public class Ariva_Bilanz {
             String str = Integer.toString(i);
             //hier wird der entgueltige Link zusammengesetzt
             System.out.println(get_link(str, link));
-            get_data(get_link(str, link));
+            getdata2(get_link(str, link));
             if ((i + 6) > page) {         //es werden immer 6 Jahre gleichzeitig angezeigt
 
 
@@ -76,109 +100,6 @@ public class Ariva_Bilanz {
     }
 
 
-    public void get_data(String link)throws IOException{
-
-        doc = Jsoup.connect(link).get();
-
-        //Waehrung bekommen
-        Element waehrung = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(2) > h3:nth-child(1)").first();
-        String waehrung_str = waehrung.text();
-        waehrung_str = waehrung_str.substring(19,22);
-        System.out.println(waehrung_str);
-
-        //Variablenbenennung
-        // erstes Jahr(ganz links)
-        //Jahr auswaehlen
-        Element jahr1 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2)").last();
-        String jahr_str1 = ntest(jahr1);
-        //Umsatz
-        Element umsatz1 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2)").last();
-        String umsatz_str1 = ntest(umsatz1);
-        //ebit
-        Element ebit1 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(2)").first();
-        String ebit_str1 = ntest(ebit1);
-        //Gewinn
-        Element gewinn1 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(12) > td:nth-child(2)").first();
-        String gewinn_str1 = ntest(gewinn1);
-        //Fremdkapital
-        Element fremdkapital1 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(18) > td:nth-child(2)").first();
-        String fremdkapital_str1 = ntest(fremdkapital1);
-        //Eigenkapital
-        Element eigenkapital1 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(21) > td:nth-child(2)").first();
-        String eigenkapital_str1 = ntest(eigenkapital1);
-
-        //zweites Jahr (wie oben)
-        Element jahr2 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(3)").first();
-        String jahr_str2 = ntest(jahr2);
-        Element umsatz2 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(3)").first();
-        String umsatz_str2 = ntest(umsatz2);
-        Element ebit2 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(3)").first();
-        String ebit_str2 = ntest(ebit2);
-        Element gewinn2 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(12) > td:nth-child(3)").first();
-        String gewinn_str2 = ntest(gewinn2);
-        Element fremdkapital2 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(18) > td:nth-child(3)").first();
-        String fremdkapital_str2 = ntest(fremdkapital2);
-        Element eigenkapital2 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(21) > td:nth-child(3)").first();
-        String eigenkapital_str2 = ntest(eigenkapital2);
-
-        //drittes Jahr (wie oben)
-        Element jahr3 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(4)").first();
-        String jahr_str3 = ntest(jahr3);
-        Element umsatz3 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(4)").first();
-        String umsatz_str3 = ntest(umsatz3);
-        Element ebit3 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(4)").first();
-        String ebit_str3 = ntest(ebit3);
-        Element gewinn3 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(12) > td:nth-child(4)").first();
-        String gewinn_str3 = ntest(gewinn3);
-        Element fremdkapital3 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(18) > td:nth-child(4)").first();
-        String fremdkapital_str3 = ntest(fremdkapital3);
-        Element eigenkapital3 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(21) > td:nth-child(4)").first();
-        String eigenkapital_str3 = ntest(eigenkapital3);
-
-        //viertes Jahr (wie oben)
-        Element jahr4 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(5)").first();
-        String jahr_str4 = ntest(jahr4);
-        Element umsatz4 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(5)").first();
-        String umsatz_str4 = ntest(umsatz4);
-        Element ebit4 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(5)").first();
-        String ebit_str4 = ntest(ebit4);
-        Element gewinn4 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(12) > td:nth-child(5)").first();
-        String gewinn_str4 = ntest(gewinn4);
-        Element fremdkapital4 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(18) > td:nth-child(5)").first();
-        String fremdkapital_str4 = ntest(fremdkapital4);
-        Element eigenkapital4 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(21) > td:nth-child(5)").first();
-        String eigenkapital_str4 = ntest(eigenkapital4);
-
-        //fuenftes Jahr (wie oben)
-        Element jahr5 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(6)").first();
-        String jahr_str5 = ntest(jahr5);
-        Element umsatz5 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(6)").first();
-        String umsatz_str5 = ntest(umsatz5);
-        Element ebit5 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(6)").first();
-        String ebit_str5 = ntest(ebit5);
-        Element gewinn5 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(12) > td:nth-child(6)").first();
-        String gewinn_str5 = ntest(gewinn5);
-        Element fremdkapital5 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(18) > td:nth-child(6)").first();
-        String fremdkapital_str5 = ntest(fremdkapital5);
-        Element eigenkapital5 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(21) > td:nth-child(6)").first();
-        String eigenkapital_str5 = ntest(eigenkapital5);
-
-        //sechstes Jahr (wie oben)
-        Element jahr6 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(7)").first();
-        String jahr_str6 = ntest(jahr6);
-        Element umsatz6 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(7)").first();
-        String umsatz_str6 = ntest(umsatz6);
-        Element ebit6 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(7)").first();
-        String ebit_str6 = ntest(ebit6);
-        Element gewinn6 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(12) > td:nth-child(7)").first();
-        String gewinn_str6 = ntest(gewinn6);
-        Element fremdkapital6 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(18) > td:nth-child(7)").first();
-        String fremdkapital_str6 = ntest(fremdkapital6);
-        Element eigenkapital6 = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(21) > td:nth-child(7)").first();
-        String eigenkapital_str6 = ntest(eigenkapital6);
-
-    }
-
     /**
      * Test, ob ein Element null ist
      * Ausserdem wird der string Formatisiert
@@ -186,23 +107,211 @@ public class Ariva_Bilanz {
      * @param e Element (z.B. umsatz1)
      * @return entweder  "-" oder den Text des Elements
      */
-    public String ntest(Element e){
-        if(e == null){
-            return "-";
+    public double ntest(Element e){
+        String s = e.text();
+        double d = 0.0;
+        if((s.contains("- ")) || (s.contentEquals("")&& s.length()<1)){
+            return 0.0;
 
-        }else{
+        }
+        else{
+            //System.out.println(e.text());
             String r = e.text();
-            if(e.text().contains("M")){
-                r = r.replace("M","000");        //fuer ganz grosse Werte wird ein M dahintergeschrieben( M =: Milliarden)
+            int t = 0;
+            boolean q = false;
+            if(r.contains(" ")){
+                r = r.replace(" ","");
             }
+            if(r.contains(",")){
+                 r = r.replaceAll(",","");
+                 q = true;
+
+            }
+            r = r + "000000";       //Bilanzsumme immer in Millionen
+            if(e.text().contains("M")){
+                r = r.replaceAll("M","000");        //fuer ganz grosse Werte wird ein M dahintergeschrieben( M =: Milliarden)
+            }
+
             if(r.contains(".")){
                 r = r.replace(".", "");
-                r = r + "000000";       //Bilanzsumme immer in Millionen
+
             }
-            return r;
+            //System.out.println(r);
+            if(q){
+                t = r.length() - 2;
+                r = r.substring(0, t);
+            }
+            if(s.contains(" ")){
+                r.replaceAll("\\S+", "");
+            }
+            d = Double.parseDouble(r);
+            if(r.contains("-")){
+
+
+                d = d* (-1);
+            }
+
+            return d;
 
         }
     }
 
+
+    /**
+     * ISIN bekommen
+     * @return
+     */
+    public String get_ISIN(){
+
+        Element e = doc.select("#pageSnapshotHeader > div.snapshotHeader.abstand > div.verlauf.snapshotInfo > div:nth-child(2)").first();
+        String s = e.text();
+        s = s.substring(6);
+
+        return s;
+    }
+
+    /**
+     * aktuelles Datum auf Tag genau bekommen
+     * @return
+     */
+    public String get_datum(){
+        Date date = java.util.Calendar.getInstance().getTime();
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
+        String dateString = dateFormatter.format(date);
+        return dateString;
+    }
+
+
+
+    /**
+     * neue Bilanzmmethode, da es leider unterschiedliche Layouts gibt (zb bei Allianz und HSBC)
+     */
+    public void getdata2(String link)throws IOException{
+        //Variablen der Bilanzwerte
+        String isin;
+        int jahr;
+        double umsatz;
+        double gewinn;
+        double ebit;
+        double fremdkapital;
+        double eigenkapital;
+
+        String letztesUpdate;
+
+        String s;
+        Elements elements;
+        Element e;
+        doc = Jsoup.connect(link).get();
+
+        //ISIN bekommen
+        isin = get_ISIN();
+
+        //letztes Update (heute) bekommen
+        letztesUpdate = get_datum();
+
+        //Waehrung bekommen
+        Element waehrung = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(2) > h3:nth-child(1)").first();
+        String waehrung_str = waehrung.text();
+        waehrung_str = waehrung_str.substring(19,22);
+        //System.out.println(waehrung_str);
+
+
+        int j = 2;
+        for (j = 2; j <= 7; j++){
+            //Jahr
+            String query = "div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(" + j + ")";
+            e = doc.select(query).first();
+            query = e.text();
+            jahr = Integer.parseInt(query);
+
+            //Umsatz bzw Gesamtergebnis
+            elements = doc.select("td:contains(Gesamtertrag)");
+            //System.out.println(elements);
+            if(elements.isEmpty()){
+                e = doc.select("td:contains(Umsatz)").first();
+                s = e.cssSelector();
+                s = getSpalte(s, j);
+                e = doc.select(s).first();
+                //s = ntest(e);
+                //umsatz = Double.parseDouble(s);
+                umsatz = ntest(e);
+            }
+            else {
+                //System.out.println("HALLO");
+                e = doc.select("td:contains(Gesamtertrag)").first();
+                s = e.cssSelector();
+                s = getSpalte(s, j);
+                e = doc.select(s).first();
+
+                //s = ntest(e);
+                //umsatz = Double.parseDouble(s);
+                umsatz = ntest(e);
+            }
+
+            //Gewinn
+            e = doc.select("td:contains(Jahresüberschuss)").first();
+            s = e.cssSelector();
+            s = getSpalte(s, j);
+            e = doc.select(s).first();
+            //s = ntest(e);
+            //gewinn = Double.parseDouble(s);
+            gewinn = ntest(e);
+
+            //EBIT
+            e = doc.select("td:contains(EBIT)").first();
+            s = e.cssSelector();
+            s = getSpalte(s, j);
+            e = doc.select(s).first();
+            //s = ntest(e);
+            //ebit = Double.parseDouble(s);
+            ebit = ntest(e);
+
+            //Eigenkapital
+            e = doc.select("td:contains(Summe Eigenkapital)").first();
+            s = e.cssSelector();
+            s = getSpalte(s, j);
+            e = doc.select(s).first();
+            //s = ntest(e);
+            //eigenkapital = Double.parseDouble(s);
+            eigenkapital = ntest(e);
+
+            //Fremdkapital
+            e = doc.select("td:contains(Summe Fremdkapital)").first();
+            s = e.cssSelector();
+            s = getSpalte(s, j);
+            e = doc.select(s).first();
+            //s = ntest(e);
+            //fremdkapital = Double.parseDouble(s);
+            fremdkapital = ntest(e);
+
+            try {
+                dbop.bilanz_insert(conn, isin, jahr, umsatz, gewinn, ebit, eigenkapital, fremdkapital, waehrung_str, letztesUpdate);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
+
+        }
+
+
+    }
+
+
+    /**
+     * liefert die Spaltennummer des vorgegebenen Wertes
+     * @param s CSS-Selektor des vorgegebenen Wertes (z.B. Gesamtergebnis bzw. Umsatz)
+     * @param i Spaltennummer für das Jahr (z.B. 2 = 1. Jahr, 3 = 2. Jahr usw.)
+     * @return  CSS-Selektor zum passenden Wert der Zeile
+     */
+    public String getSpalte(String s, int i){
+        int end;
+        end = s.indexOf(" > td.subtitle.level");
+        s = s.substring(0, end);
+        s = s + " > td:nth-child(" + i + ")";
+
+        //System.out.println(s);
+        return s;
+
+    }
 
 }
