@@ -19,31 +19,44 @@ public class DBOperations {
      * @param aktienname
      * @param aktienlink
      */
-    public void aktien_insert(Connection conn, String ISIN, String WKN, String Branche, String aktienname, String aktienlink){
-        String query = "INSERT INTO aktie("
-                + "ISIN,"
-                + "WKN,"
-                + "Branche,"
-                + "Aktienname,"
-                + "Aktienlink) VALUES("
-                + "?, ?, ?, ?, ?)";
-        System.out.println(query);
-        try{
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1,ISIN);
-            pstmt.setString(2, WKN);
-            pstmt.setString(3, Branche);
-            pstmt.setString(4,aktienname);
-            pstmt.setString(5, aktienlink);
-            //pstmt.setString(6, index);
-
-            // execute the Statement
-            pstmt.executeUpdate();
-            pstmt.close();
-
-        }catch (Exception e){
-            System.out.println(e);
+    public void aktien_insert(Connection conn, String ISIN, String WKN, String Branche, String aktienname, String aktienlink)throws SQLException{
+        String query;
+        boolean test = true;
+        query = "SELECT * FROM aktie WHERE aktie.ISIN = '" + ISIN + "'";
+        Statement selectStatement = conn.createStatement();
+        ResultSet resultset = selectStatement.executeQuery(query);
+        if(resultset.next()){
+            test = false;
+            resultset.close();
         }
+
+        if(test){
+            query = "INSERT INTO aktie("
+                    + "ISIN,"
+                    + "WKN,"
+                    + "Branche,"
+                    + "Aktienname,"
+                    + "Aktienlink) VALUES("
+                    + "?, ?, ?, ?, ?)";
+            //System.out.println(query);
+            try{
+                PreparedStatement pstmt = conn.prepareStatement(query);
+                pstmt.setString(1,ISIN);
+                pstmt.setString(2, WKN);
+                pstmt.setString(3, Branche);
+                pstmt.setString(4,aktienname);
+                pstmt.setString(5, aktienlink);
+                //pstmt.setString(6, index);
+
+                // execute the Statement
+                pstmt.executeUpdate();
+                pstmt.close();
+
+            }catch (Exception e){
+                System.out.println(e);
+            }
+        }
+
     }
 
     /**
@@ -55,8 +68,19 @@ public class DBOperations {
      * @param waehrung
      * @param letztesUpdate
      */
-    public void kurs_insert(Connection conn, String ISIN, String datum, double kurs, String waehrung, String letztesUpdate){
-        String query = "INSERT INTO kurs("
+    public void kurs_insert(Connection conn, String ISIN, String datum, double kurs, String waehrung, String letztesUpdate)throws SQLException{
+        String query;
+        boolean test = true;
+        query = "SELECT * FROM kurs WHERE kurs.Datum = " + datum + " AND kurs.ISIN = '" + ISIN + "'";
+        Statement selectStatement = conn.createStatement();
+        ResultSet resultset = selectStatement.executeQuery(query);
+        if(resultset.next()){
+            test = false;
+            resultset.close();
+        }
+
+
+        query = "INSERT INTO kurs("
                 + "ISIN,"
                 + "Datum,"
                 + "Kurs,"
@@ -91,36 +115,54 @@ public class DBOperations {
      * @param waehrung
      * @param letztesUpdate
      */
-    public void bilanz_insert(Connection conn, String ISIN, int jahr, double umsatz, double gewinn, double ebit, double eigenkapital, double fremdkapital, String waehrung, String letztesUpdate){
-        String query = "INSERT INTO bilanz ("
-                +"ISIN,"
-                +"Jahr,"
-                +"Umsatz,"
-                +"Gewinn,"
-                +"EBIT,"
-                +"Eigenkapital,"
-                +"Fremdkapital,"
-                +"Waehrung,"
-                +"letztesUpdate) VALUES("
-                +"?,?,?,?,?,?,?,?,?)";
-        try {
-            PreparedStatement ptsmt = conn.prepareCall(query);
-            ptsmt.setString(1, ISIN);
-            ptsmt.setInt(2, jahr);
-            ptsmt.setDouble(3, umsatz);
-            ptsmt.setDouble(4, gewinn);
-            ptsmt.setDouble(5, ebit);
-            ptsmt.setDouble(6, eigenkapital);
-            ptsmt.setDouble(7, fremdkapital);
-            ptsmt.setString(8, waehrung);
-            ptsmt.setString(9, letztesUpdate);
-
-            ptsmt.executeUpdate();
-            ptsmt.close();
-
-        }catch (Exception e){
-            System.out.println(e);
+    public void bilanz_insert(Connection conn, String ISIN, int jahr, double umsatz, double gewinn, double ebit, double eigenkapital, double fremdkapital, String waehrung, String letztesUpdate)throws SQLException{
+        String query;
+        boolean test = true;
+        query = "SELECT * FROM bilanz WHERE Jahr = " + jahr + " AND bilanz.ISIN = '" + ISIN + "'";
+        Statement selectStatement = conn.createStatement();
+        ResultSet resultset = selectStatement.executeQuery(query);
+        if(resultset.next()){
+            test = false;
+            resultset.close();
         }
+        if(test){
+            query = " INSERT INTO bilanz ("
+                    +"ISIN,"
+                    +"Jahr,"
+                    +"Umsatz,"
+                    +"Gewinn,"
+                    +"EBIT,"
+                    +"Eigenkapital,"
+                    +"Fremdkapital,"
+                    +"Waehrung,"
+                    +"letztesUpdate) VALUES("
+                    +"?,?,?,?,?,?,?,?,?)";
+            try {
+                PreparedStatement ptsmt = conn.prepareStatement(query);
+                ptsmt.setString(1, ISIN);
+                ptsmt.setInt(2, jahr);
+                ptsmt.setDouble(3, umsatz);
+                ptsmt.setDouble(4, gewinn);
+                ptsmt.setDouble(5, ebit);
+                ptsmt.setDouble(6, eigenkapital);
+                ptsmt.setDouble(7, fremdkapital);
+                ptsmt.setString(8, waehrung);
+                ptsmt.setString(9, letztesUpdate);
+
+                ptsmt.executeUpdate();
+                ptsmt.close();
+
+            }catch (Exception e){
+                System.out.println(e);
+            }
+        }
+
+
+
+
+
+
+
 
 
     }
@@ -165,7 +207,7 @@ public class DBOperations {
         Statement stmt = conn.createStatement();
 
         String query = "SELECT * FROM Aktie WHERE ISIN = '" + isin + "'";
-        ResultSet rs = stmt.executeQuery("SELECT * FROM Aktie WHERE ISIN =");
+        ResultSet rs = stmt.executeQuery("SELECT * FROM Aktie WHERE ISIN = 3");
 
         while (rs.next()){
             System.out.println(rs.getNString("Aktienname"));
