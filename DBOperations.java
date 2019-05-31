@@ -2,6 +2,7 @@ package Datenbank;
 
 import java.sql.*;
 import java.text.DateFormat;
+import java.util.ArrayList;
 
 /**
  * @author Tobias Heiner
@@ -71,35 +72,37 @@ public class DBOperations {
     public void kurs_insert(Connection conn, String ISIN, String datum, double kurs, String waehrung, String letztesUpdate)throws SQLException{
         String query;
         boolean test = true;
-        query = "SELECT * FROM kurs WHERE kurs.Datum = " + datum + " AND kurs.ISIN = '" + ISIN + "'";
+        query = "SELECT * FROM kurs WHERE kurs.Datum = '" + datum + "'" + " AND kurs.ISIN = '" + ISIN + "'";
         Statement selectStatement = conn.createStatement();
         ResultSet resultset = selectStatement.executeQuery(query);
         if(resultset.next()){
             test = false;
             resultset.close();
         }
+        if(test){
+            query = "INSERT INTO kurs("
+                    + "ISIN,"
+                    + "Datum,"
+                    + "Kurs,"
+                    + "Waehrung,"
+                    + "letztesUpdate) VALUES("
+                    + "?, ?, ?, ?, ?)";
+            try{
+                PreparedStatement pstmt = conn.prepareStatement(query);
+                pstmt.setString(1, ISIN);
+                pstmt.setString(2, datum);
+                pstmt.setDouble(3, kurs);
+                pstmt.setString(4, waehrung);
+                pstmt.setString(5, letztesUpdate);
 
-
-        query = "INSERT INTO kurs("
-                + "ISIN,"
-                + "Datum,"
-                + "Kurs,"
-                + "Waehrung,"
-                + "letztesUpdate) VALUES("
-                + "?, ?, ?, ?, ?)";
-        try{
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, ISIN);
-            pstmt.setDate(2, Date.valueOf(datum));
-            pstmt.setDouble(3, kurs);
-            pstmt.setString(4, waehrung);
-            pstmt.setTimestamp(5, Timestamp.valueOf(letztesUpdate));
-
-            pstmt.executeUpdate();
-            pstmt.close();
-        }catch (Exception e){
-            System.out.println(e);
+                pstmt.executeUpdate();
+                pstmt.close();
+            }catch (Exception e){
+                System.out.println(e);
+            }
         }
+
+
     }
 
     /**
@@ -216,6 +219,20 @@ public class DBOperations {
 
     }
 
+    public ArrayList isin_select(Connection conn) throws SQLException{
+        ArrayList<String> liste  = new ArrayList<>();
+        String query = "SELECT ISIN FROM aktie";
+        Statement statement = conn.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+        int i = 0;
+        while (resultSet.next()){
+            liste.add(resultSet.getNString(i));
+            i++;
+        }
+
+        return liste;
+    }
+
 
     public void kurs_select(){
 
@@ -225,4 +242,12 @@ public class DBOperations {
     public void bilanz_select(){
 
     }
+
+
+    public void kurs_drop(Connection conn)throws SQLException{
+        String query = "TRUNCATE  TABLE kurs";
+        Statement stmt = conn.createStatement();
+        stmt.executeUpdate(query);
+    }
+
 }
