@@ -33,9 +33,8 @@ create table `index`
 create table kurs
 (
     ISIN          varchar(12)  not null,
-    Datum         time         null,
+    Datum         varchar(255) null,
     Kurs          double       null,
     Waehrung      varchar(255) null,
     letztesUpdate varchar(255) null
 );
-
