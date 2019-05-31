@@ -1,10 +1,6 @@
 import Ariva.Ariva_Allgemein;
 import Ariva.Ariva_Bilanz;
 import Ariva.Ariva_Kurs_CSV;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.DocumentType;
-import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,6 +34,15 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args)throws IOException {
+        /*Ariva_CSV_Parser ariva_csv_parser = new Ariva_CSV_Parser();
+        try {
+            ariva_csv_parser.test("hallo");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.exit(10);*/
+
+
         /*
         Ariva_Bilanz ab = new Ariva_Bilanz();
         try {
@@ -71,7 +76,7 @@ public class Main {
 
         //Test der Ariva_Allgemein
         Ariva_Allgemein ag = new Ariva_Allgemein();
-
+/*
         try {
 
             ag.getInfo("https://www.ariva.de/spotify-aktie");
@@ -81,7 +86,7 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.exit(100);
+        System.exit(100);*/
 
         System.out.println("Download der CSV-Daten aller Aktien auf ariva.de?       -> 1");
         System.out.println("Download einer einzelnen CSV-Datei einer beliebigen Aktie?      ->2");
@@ -133,11 +138,6 @@ public class Main {
      */
     public static void aktienliste(){
 
-        Ariva_Kurs_CSV ariva_kurs_csv = new Ariva_Kurs_CSV();
-        Ariva_Allgemein ariva_allgemein = new Ariva_Allgemein();
-        Ariva_Bilanz ariva_bilanz = new Ariva_Bilanz();
-
-
         ArrayList<String> liste = new ArrayList<>();
         liste.add("https://www.ariva.de/adidas-aktie");
         liste.add("https://www.ariva.de/allianz-aktie");
@@ -182,11 +182,21 @@ public class Main {
 
         Iterator it = liste.iterator();
         while (it.hasNext()){
+            Ariva_Kurs_CSV ariva_kurs_csv3 = new Ariva_Kurs_CSV();
+            Ariva_Allgemein ariva_allgemein3 = new Ariva_Allgemein();
+            Ariva_Bilanz ariva_bilanz3 = new Ariva_Bilanz();
+
             String s = (String) it.next();
             try {
                 //acsv.kurs_csv_link(s);
-                ariva_allgemein.getInfo(s);
-                ariva_bilanz.bilanz(s);
+                ariva_allgemein3.getInfo(s);
+                ariva_kurs_csv3.csv_parser(s);
+                System.out.println("=========================================");
+                System.out.println("=========================================");
+                System.out.println("=========================================");
+
+
+                ariva_bilanz3.bilanz(s);
 
 
             } catch (Exception e) {
@@ -198,4 +208,3 @@ public class Main {
 
 
 }
-
