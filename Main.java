@@ -1,6 +1,7 @@
 import Ariva.Ariva_Allgemein;
 import Ariva.Ariva_Bilanz;
 import Ariva.Ariva_Kurs_CSV;
+import Morningstar.Morningstar_Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,48 +35,21 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args)throws IOException {
-        /*Ariva_CSV_Parser ariva_csv_parser = new Ariva_CSV_Parser();
-        try {
-            ariva_csv_parser.test("hallo");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        System.exit(10);*/
 
-
-        /*
-        Ariva_Bilanz ab = new Ariva_Bilanz();
-        try {
-            ab.getdata2("https://www.ariva.de/spotify-aktie/bilanz-guv");
-        }catch (Exception e){
-
-        }
-        System.exit(123);*/
-
-
-        /*
-        Document doc = Jsoup.connect("https://www.ariva.de/spotify-aktie/bilanz-guv").get();
-        Element e = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(22) > td:nth-child(1)").last();
-        System.out.println(e.text());
-        if(e.text().contains("Summe kurzfristiges Fremdkapital")){
-            Element f = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(24) > td:nth-child(2)").first();
-            System.out.println(f.text());
-        }
-        else {
-            Element f = doc.select("div.tabelleUndDiagramm:nth-child(4) > div:nth-child(3) > table:nth-child(1) > tbody:nth-child(1) > tr:nth-child(17) > td:nth-child(2)").first();
-        }*/
-        //System.exit(-1);
+        Morningstar_Test morningstar_test = new Morningstar_Test();
+        morningstar_test.steuern();
+        System.exit(7);
 
 
 
         //Test auf Funktionalität von Ariva_Kurs_CSV
-        Ariva_Kurs_CSV acsv = new Ariva_Kurs_CSV();
+        //Ariva_Kurs_CSV acsv = new Ariva_Kurs_CSV();
 
         //Test auf Bilanz und Datenbankeintrag
-        Ariva_Bilanz ariva_bilanz = new Ariva_Bilanz();
+        //Ariva_Bilanz ariva_bilanz = new Ariva_Bilanz();
 
         //Test der Ariva_Allgemein
-        Ariva_Allgemein ag = new Ariva_Allgemein();
+        //Ariva_Allgemein ag = new Ariva_Allgemein();
 /*
         try {
 
@@ -114,7 +88,7 @@ public class Main {
             String aktienlink = scan.next();
 
             try {
-                acsv.kurs_csv_link(aktienlink);
+                //acsv.kurs_csv_link(aktienlink);
 
             } catch (Exception e) {
                 e.printStackTrace();
