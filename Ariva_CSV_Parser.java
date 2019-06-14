@@ -98,6 +98,9 @@ public class Ariva_CSV_Parser {
         if(s.contains(" ")){
             return 0.0;
         }
+        if(s.contains(".")){
+            s = s.replace(".", "");
+        }
         if(s.contains(",")){
             s = s.replace(",", ".");
         }
