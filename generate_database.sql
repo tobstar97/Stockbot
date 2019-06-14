@@ -38,3 +38,4 @@ create table kurs
     Waehrung      varchar(255) null,
     letztesUpdate varchar(255) null
 );
+
