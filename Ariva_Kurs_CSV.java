@@ -3,57 +3,118 @@ package Ariva;
 
 /**
  * @author Tobias Heiner
- * @description downloadet ein CSV-File mit allen historischen Kursdaten einer Aktie auf ariva.de
- * @verbindung um das Programm automatisiert ablaufen zu lassen, muss die Methode kurs_csv_link automatisch links
- *              von der Feeder_Ariva Klasse bekommen -> siehe Steuerung-Klasse
- *
- * @anleitung: Objekt der Klasse Ariva_Kurs_CSV erstellen und die Methode csv-parser starten
- * diese bekommt einfach nen Aktienlink übergeben (z.B. aus dem Feeder oder der Aktienliste für Herr Lehner)
+ * @description stellt die verbindung zur website ariva.de her und liefert den aktuellen Kurs und Gewinn
+ * @problem ariva block nach einer bestimmten Anzahl von Abrufen in einer gewissen Zeit die IP des Computers
+ * @loesung wir starten eine "Versuchsreihe", um die genauen Parameter rauszufinden, wann ariva die IP blockiert
  */
 
-import Datenbank.DBConnection;
-import Datenbank.DBOperations;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.UnknownHostException;
 
-import java.net.URL;
 
-import java.io.*;
-import java.sql.Connection;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
+
+import java.util.Scanner;
 
 
+public class Ariva_Kurs {
 
-public class Ariva_Kurs_CSV {
-
+    String aktienname;
+    String ISIN;
+    String url = "https://www.ariva.de/";
+    String strdUrlBilanzGuV = "https://www.ariva.de/amazon-aktie/bilanz-guv#stammdaten";    //+ aktienname mit "-" + "-" + ISIN         Standardurl für bilanz-guv
     Document doc;
-    ArrayList<String> arrayList = new ArrayList<>();
-    String waehrungslink;
-    String i;
-    String isin_s;
-    String letztesUpdate;
 
+    Scanner scan;
 
-    DBConnection dbcon = new DBConnection();
-    Connection conn;
+    double gewinn;
+    double kurs;
+    HashMap<String, Double> hm = new HashMap<String, Double>();
+    ArrayList<String> al = new ArrayList<>();
+    ArrayList<String> al2 = new ArrayList<>();
 
-    DBOperations dbop = new DBOperations();
+    /**
+     * Connection zu den unterschiedlichen urls für die historischen Kurse
+     * @param url
+     * @throws IOException
+     */
+    public void connectKurs(String url) throws IOException {
+        doc = Jsoup.connect(url).get();
 
-    {
-        try {
-            conn = dbcon.setupConnection("root", "tobstar");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 
+    /**
+     * Stellt eine Connection zur website her
+     * @throws IOException
+     */
+    public void connect() throws IOException {
+        scan = new Scanner(System.in);
+
+        System.out.println("Geben sie den Aktiennamen ein");
+        aktienname = scan.next();
+
+        //einzufügen: für jedes leerzeichen im aktiennamen ein "-" einfügen
+
+        System.out.println("Geben sie die ISIN ein");
+        ISIN = scan.next();
+
+        url = url + ISIN;
+
+        //doc = Jsoup.connect(url).get();
+        doc = Jsoup.connect("https://www.ariva.de/wirecard-aktie/bilanz-guv").get();
+        System.out.println("basst");
+
+    }
+
+    /**
+     *Liefert den aktuellen Kurs einer Aktie auf ariva
+     * @return Kurs als double
+     */
+    public double getKurs() {
+        Element span = doc.select("span[itemprop=price]").first();
+        String content;
+
+        content = span.text();
+
+
+        //System.out.println(content);
+
+        //System.out.println(convert+"TEST");
+
+        content = mod(content);
+        kurs = Double.parseDouble(content);
+        //System.out.println(kurs);
+        return kurs;
+
+    }
+
+
+    /**
+     * Liefert den aktuellen gewinn eines Unternehmens auf ariva
+     * @return gewinnn als double
+     */
+    public double getGewinn() {
+        Element meta = doc.getElementsByClass("subtitle level text-linkblue clickCursor").get(3);
+        Element table = meta.siblingElements().get(4);
+        //Element tb = table.elementSiblingIndex();
+        String content = table.text();
+
+        content = mod(content);
+
+        gewinn = Double.parseDouble(content);
+        System.out.println(gewinn);
+
+        return gewinn;
+    }
 
     /**
      * Liefert die Analysen für 12 Monate
@@ -72,158 +133,261 @@ public class Ariva_Kurs_CSV {
 
 
     /**
-     * lädt die CSV-Datei des kompletten historischen Kurses runter
-     * Schwierigkeit: Linkzusammensetzung automatisieren
      *
-     * @param link: URL der Aktie (bekommt man von Feeder_Ariva) -> Steuerungsklasse
-     * @return fertiger CSV-Download-Link
-     */
-    public void kurs_csv_link(String link) throws IOException {
-        //Problem: es gibt einige Aktienlinks die anders aufgebaut sind
-
-        if (link.contains("https://www.ariva.de/quote/profile")) {
-            link = link.replace("profile", "historic");
-
-            System.out.println(link);
-
-        } else if (link.contains("https://www.ariva.de/anleihen")) {
-            //@Lukas hier
-            link = link.replace("anleihen/profil", "quote/historic");
-
-        } else {
-            //@Lukas hier
-            link = link + "/historische_kurse";         //Link aus Ariva_Feeder zusammensetzen
-        }
-
-        doc = Jsoup.connect(link).get();            //html-Dokument downloaden
-        Element secu = doc.select("div.formRow:nth-child(4) > form:nth-child(2) > input:nth-child(1)").first();            //"secu"-Element auswaehlen und in secu speichern
-        String secu_s = secu.val();             //value des CSS-Elements als String in secu_s
-        Element boerse_id = doc.select("div.formRow:nth-child(4) > form:nth-child(2) > input:nth-child(2)").first();            //"boerse_id"-Element auswaehlen
-        String boerse_id_s = boerse_id.val();           //value des CSS-Elements als String in boerse_id_s
-
-
-        //Waehrung des Kurses herausfinden und in der Arraylist speichern
-        waehrungslink = link + boerse_id_s;
-
-
-
-
-
-
-
-        //Downloadlink zusammensetzen
-        String csv_down = "https://www.ariva.de/quote/historic/historic.csv?secu=" + secu_s + "&boerse_id=" + boerse_id_s + "&clean_split=1&clean_payout=0&clean_bezug=1&min_time=01.01.90&max_time=" + aktuelles_datum() + "&trenner=%3B&go=Download[HTTP/2.0";
-        System.out.println(csv_down);
-
-        //Benennung der CSV-Datei mit der ISIN der Aktie; Speicherung in Ordner CSV-Daten
-        //mein Verzeichnis sieht folgendermaßen aus: Ariva_Test > .idea, CSV-Daten, out,  src(> Main, Steuerung, ..)
-        Element isin = doc.select(".verlauf > div:nth-child(2)").first();
-        i = isin.text();
-        isin_s = isin.text();
-        i = i.replace("ISIN: ", "");
-        i = i + ".csv";
-
-        arrayList.add(i);
-
-        File targetDir = new File("CSV-Daten");
-        File targetFile = new File(targetDir, i);
-
-        System.out.println(i);
-
-        //Download der CSV-Datei
-        try (BufferedInputStream inputStream = new BufferedInputStream(new URL(csv_down).openStream());
-             FileOutputStream fileOS = new FileOutputStream(targetFile)) {          //die Daten werden in ein CSV-File gespeichert; Name des Files: ISIN
-            byte data[] = new byte[1024];
-            int byteContent;
-            while ((byteContent = inputStream.read(data, 0, 1024)) != -1) {
-                fileOS.write(data, 0, byteContent);
-            }
-        } catch (IOException e) {
-            // handles IO exceptions
-            System.err.println(e);
-        }
-    }
-
-
-    /**
-     * @return aktuelles Datum als String
-     */
-    public String aktuelles_datum() {
-        Date d = new Date();
-        DateFormat df;
-        df = DateFormat.getDateInstance(DateFormat.MEDIUM);
-        String datum = df.format(d);
-        //System.out.println(datum);
-        return datum;
-    }
-
-    /**
-     * @Lukas hier die Anleitung
-     * hier muss einen Methode hin, die die Waehrung des Kurses einer Aktie besimmt
-     * am einfachsten ist es, wenn du die Methoden in der kurs_csv_link Methode aufrufst ( direkt nach dem Zumassemsetzen des links zu den historischen Kursen (hab es dir markiert)
-     * "Anleitung": lies am besten einfach den letzten Schlusswert einer Aktie aus (z.b. https://www.ariva.de/amazon-aktie/historische_kurse
-     * da steht dann die Waehrung hhinten
-     * und nun zur komplizierteren Sache: du musst es irgendwie schaffen, dass du die CSV-Daten + die Währung in die Datenbank bekommst
-     * die dürfen halt nicht durchgemischt sein (also z.b. amazon mit Euro, Lufthansa mit Pfund usw.)
-     * Viel Spaß!!!
-     */
-    /**
-     * @author Lukas Meinzer
-     * @param link (In welcher Form wird der hier uebergeben? --> muss man dann evtl noch anpassen)
-     * @return Waehrung als String
+     * liest den kurs und das zugehörige datum einer aktie aus
+     * bekommt die links aus der arraylist, die vorher mit der methode kursLink reingeschrieben wurden
      * @throws IOException
      */
-    public String bestimme_waehrung(String link) throws IOException{
-        //Bestimme die Waehrung eines Kurses:
-        try {
-            doc = Jsoup.connect(link).get();
-        } catch (IOException e) {
-            System.err.println("Probleme bei der Link-Eingabe");
-        }
-        Element e = doc.getElementsByClass("#pageHistoricQuotes > div.column.twothirds > div > table > tbody > tr:nth-child(3) > td.font-size-14.left.nobr.colwin").first();
-        String test = e.toString();
-        if (test.contains("$")){
-            return "USD";
-        }
-        if (test.contains("€")){
-            return "EUR";
-        }
-        if(test.contains("£")){
-            return "GBP";
-        }
-        return "";
-    }
+    public void getKursGesamt() throws IOException {
+
+        int i = 0;
+        int k = 0;
+        double d = 0;
+        //Loesung für das blockier-Problem - Versuch
+        int anzahl = 0;         //Variable, um die Anzahl der Abrufe zu zählen
+        String st;
+        Element testdate = doc.getElementsByClass("arrow0").get(0);
+        String s = testdate.text();
 
 
+        int z = 0;
+        while (z < al.size()) {
+            anzahl++;           //Anzahl der Verbindungen auf die ariva seite
+            System.out.println(anzahl);         //gibt die Anzahl aus
+            System.out.println(al.get(z));
+            connectKurs(al.get(z));
+            //doc = Jsoup.connect("https://www.ariva.de/allianz-aktie/historische_kurse?boerse_id=6&month=2018-10-31&currency=&clean_split=1&clean_split=0&clean_payout=0&clean_bezug=1&clean_bezug=0").get();
+            k = doc.getElementsByClass("arrow0").size();
+            //System.out.println(k);
+
+            while (i < k) {
+                //System.out.println("Test");
+                String content;
+                Element meta = doc.getElementsByClass("arrow0").get(i);
+                Element date = meta.child(0);
+                Element value = meta.child(4);
+
+                content = value.text();
 
 
-    public void csv_parser(String link)throws IOException{
+                content = mod(content);
 
-        kurs_csv_link(link);
-        String w = bestimme_waehrung(waehrungslink);
-        Ariva_CSV_Parser ariva_csv_parser = new Ariva_CSV_Parser();
-        try {
-            ariva_csv_parser.test(i);
-            for(String datum : ariva_csv_parser.hm.keySet()){
-                double kurs = ariva_csv_parser.hm.get(datum);
-                letztesUpdate = get_datum();
-                dbop.kurs_insert(conn, isin_s, datum, kurs, w, letztesUpdate);
+                d = Double.parseDouble(content);
+                st = date.text();
+                System.out.println(d + "  " + st);
+                System.out.println(anzahl);
+                hm.put(st, d);
+                //System.out.println(hm.size());
+
+                i++;
 
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            z++;
+            i = 0;
         }
-
-
+        al.clear();
 
 
     }
 
-    public String get_datum(){
-        Date date = java.util.Calendar.getInstance().getTime();
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
-        String dateString = dateFormatter.format(date);
-        return dateString;
+
+    /**
+     * @author Lukas Meinzer, Tobias Heiner
+     * funktioniert!
+     * soll den hauphandelsplatz einer aktie rausfinden
+     * https://www.ariva.de/amazon-aktie/kurs immer der 4. eintrag von oben in der tabelle ist der haupthandelsplatz
+     * daraus muss die boerse_id ausgelesen werden, z.B. bei Nasdaq 40
+     * @param str in Form von "<name>-aktie"
+     * @return Teilstring, "boerse_id=..."
+     * @throws IOException
+     */
+    public String haupthandelsplatz(String str) throws IOException {
+
+        try {
+            //doc = Jsoup.connect("https://www.ariva.de/"+str+"/kurs").get();
+            doc = Jsoup.connect(str + "/kurs").get();
+        } catch (ConnectException e) {
+            System.err.println("Probleme bei der Link-Eingabe");
+        }
+
+
+        //Hier testen ob die Aktie überhaupt eingetragene Kurse hat:
+        Element e = doc.getElementById("result_table_0").child(2);
+        String temp = e.toString();
+        //System.out.println(temp2);
+
+        if (temp.contains("keine Kurse vorhanden")) {
+            return "boerse_id=";
+        }
+
+
+        //Ab hier der Normalfall/Gutfall
+
+
+        //Hier erstmal rausfinden welches der erste Kurs der Aktie ist, der kein realtime-Kurs ist
+        String text;
+        int count = 0;
+        for (int i = 0; i < 101000010; i++) {
+            Element e2 = doc.getElementsByClass("ellipsis padding-right-5").get(i);
+            text = e2.toString();
+            if (text.contains("mp_realtime")) {
+                count++;
+            } else {
+                break;
+            }
+        }
+        //System.out.println(count);
+
+
+        Element e3 = doc.getElementsByClass("ellipsis padding-right-5").get(count);
+        Element meta = e3.child(0);
+        //System.out.println("Handelsplatz: " +e.text());
+
+        //Ab hier etwas unschön programmiert aber funktioniert!
+        //meta zu String umwandeln
+        String temp2 = meta.toString();
+        int x = 0;
+        int y = 0;
+
+        //meta-String durchlaufen bis man den Anfang von "boerse_id=.." gefunden hat
+        while (temp2.charAt(x) != '?') {
+            x++;
+        }
+        //und bis man das Ende gefunden hat
+        while (y < x) {
+            while (temp2.charAt(y) != '"') {
+                y++;
+
+            }
+            y++;
+        }
+
+        //Substring ausgeben
+        String temp3 = temp2.substring(x + 1, y - 1);
+        //System.out.println(temp3);
+
+        return temp3;
+    }
+
+
+    /**
+     * die WKN einer Aktie herausfinden
+     * @author Lukas Meinzer
+     * @param str (Aktienname) in der Form <name>-aktie
+     * @throws UnknownHostException
+     * @throws ConnectException
+     * @retun WKN
+     */
+    public String getWKN(String str) throws IOException {
+        if (str != null) {
+
+
+            try {
+                doc = Jsoup.connect("https://www.ariva.de/" + str).get();
+            } catch (ConnectException e) {
+                System.err.println("Probleme bei der Link-Eingabe.");
+            }
+
+
+            Element e = doc.getElementsByClass("verlauf snapshotInfo").get(0);
+            Element temp = e.child(0);
+            String wkn = temp.toString();
+            //testen ob überhaupt eine WKN vorhanden ist
+            if (wkn.contains("WKN:")) {
+                wkn = wkn.substring(12, 18);
+
+
+                System.out.println(wkn);
+
+
+                return wkn;
+            } else {
+                System.out.println("Der eingegebene String enthält keine WKN");
+                return "---";
+            }
+
+        } else {
+            throw new IOException("Stringübergabe fehlgeschlagen");
+        }
+    }
+
+
+    /**
+     * liest alle links zu den monaten der historischen kurse in eine arraylist ein
+     * @param str sollte später die url einer aktie sein, Verbindung zur feeder klasse
+     * @throws IOException
+     */
+    public void kursLink(String str) throws IOException {
+
+        String link = str;
+
+        //link = "https://www.ariva.de/allianz-aktie/historische_kurse?boerse_id=6&month=1900-10-31&currency=&clean_split=1&clean_split=0&clean_payout=0&clean_bezug=1&clean_bezug=0";
+        String d = str + "/historische_kurse";
+        doc = Jsoup.connect(d).get();
+        int i = link.indexOf("month=");
+        int laenge = link.length();
+        String teil1;
+        String teil2;
+        String link2;
+        teil1 = link.substring(0, i);
+        teil2 = link.substring(i + 16, laenge);
+
+
+        Element e = doc.select("label").get(1);
+        int groesse = e.childNodeSize();
+        int e2 = e.nextElementSibling().childNodeSize();
+        Element e3 = e.nextElementSibling().child(2);
+        //System.out.println(e2);
+
+
+        int j = 1;
+        while (j < (e2 / 2)) {
+            String erg = e.nextElementSibling().child(j).val();
+            String res;
+            res = teil1 + "month=" + erg + teil2;
+            al.add(res);
+
+            j++;
+
+        }
+        //System.out.println(al.size());
+
+
+    }
+
+    /**
+     * ausgabe der größe der hashmap, in der die key value paare von datum und kurs gespeichert sind
+     */
+    public void aus() {
+        System.out.println(hm.size());
+        System.out.println(hm);
+    }
+
+    /**
+     * bringt den kurs in das richtige float/double format (ersetzt , mit . usw)
+     * @param content
+     * @return
+     */
+    public String mod(String content) {
+
+        if (content.contains(".")) {
+            content = content.replace(".", "");
+        }
+
+        if (content.contains(",")) {
+            content = content.replace(",", ".");
+        }
+
+        return content;
+    }
+
+
+    public String ablauf(String link) throws IOException {
+
+
+        String g = link + "/historische_kurse?" + haupthandelsplatz(link) + "&month=2019-03-31&clean_split=1&clean_split=0&clean_payout=0&clean_bezug=1&clean_bezug=0";
+
+        return g;
     }
 
 
