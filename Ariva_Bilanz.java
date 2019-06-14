@@ -54,11 +54,15 @@ public class Ariva_Bilanz {
 
 
         doc = Jsoup.connect(link).get();
+        Element pagenode;
+
+        try{
+            pagenode = doc.select("#pageFundamental > div:nth-child(3) > form:nth-child(1) > select:nth-child(2)").first();
+        }catch (Exception e){
+            return;
+        }
 
 
-
-
-        Element pagenode = doc.select("#pageFundamental > div:nth-child(3) > form:nth-child(1) > select:nth-child(2)").first();
         int page = pagenode.childNodeSize();
         page = (page / 2) - 1;
         //ab hier werden die verschiedenen Zeitintervalle bestimmt, sodass es nur minimale Ueberschneidungen gibt
