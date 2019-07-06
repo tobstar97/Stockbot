@@ -10,6 +10,34 @@ import java.util.ArrayList;
  * Änderungen an Datenbank notwendig: ID überall raus, Bilanz: Jahr als int
  */
 public class DBOperations {
+    
+    /**
+     * Herausfinden des Aktiennamens bei bekannter ISIN
+     * @author Lukas Meinzer
+     * @param ISIN
+     * @return Aktienname
+     */
+    public static String getName(Connection conn, String ISIN){
+
+        String query;
+        query = "SELECT Aktienname FROM aktie WHERE aktie.ISIN = '" + ISIN + "'";
+        try{
+            Statement selectStatement = conn.createStatement();
+            ResultSet rs = selectStatement.executeQuery(query);
+            int i = 1;
+            String returner = "";
+            while(rs.next()){
+                returner = rs.getString(i);
+                i++;
+            }
+            rs.close();
+            return returner;
+        } catch (Exception e){
+            System.out.println(e);
+            return "Excpetion";
+        }
+    }
+    
 
     /**
      * Insert in die Aktientabelle
