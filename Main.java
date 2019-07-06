@@ -61,6 +61,54 @@ public class Main {
             e.printStackTrace();
         }
         System.exit(100);*/
+        
+        
+        //_______________nötig um hier operationen auf der DB durchführen zu können_____________
+
+        DBConnection dbcon = new DBConnection();
+        Connection conn;
+
+        DBOperations dbop = new DBOperations();
+
+        {
+            try {
+                conn = dbcon.setupConnection("root", "Luke");
+            } catch (Exception e) {
+                conn = null;
+                e.printStackTrace();
+            }
+        }
+
+
+//________________________________________________________________________________________
+//___________________USER ABFRAGE ROHFASSUNG_______________________________________________
+
+
+            File dir = new File("C:\\Users\\Luke the Duke\\Desktop\\Java\\Programme\\Studienprojekt_Ariva_neu\\CSV-Daten");
+                //Alle Dateien in dem genannten Pfad auflisten lassen
+            File[] files = dir.listFiles();
+            //String den wir für die Abfrage getName brauchen:
+            String temp;
+            if (files != null) { // Erforderliche Berechtigungen etc. sind vorhanden
+                for (int i = 0; i < files.length; i++) {
+                    //Substring um ".csv" am Ende wegzuschneiden
+                    temp = files[i].getName().substring(0,12);
+                    //Printe die ISIN und den Namen
+                    System.out.println(temp + "\t" + dbop.getName(conn,temp));
+                }
+            }
+
+            System.out.println("\n");
+            String auswahl;
+            System.out.println("Gib den Namen der Aktie ein, die du dir ansehen möchtest.");
+            Scanner scan2 = new Scanner(System.in);
+            auswahl = scan2.next();
+
+
+//_________________________________________________________________________________________
+//_________________________________________________________________________________________
+        
+        
 
         System.out.println("Download der CSV-Daten aller Aktien auf ariva.de?       -> 1");
         System.out.println("Download einer einzelnen CSV-Datei einer beliebigen Aktie?      ->2");
