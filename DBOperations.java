@@ -262,12 +262,66 @@ public class DBOperations {
     }
 
 
-    public void kurs_select(){
+      /**
+     * Select Statement für den Kurs, bei bekanntem Aktienname
+     * @author Lukas Meinzer
+     * @param conn
+     * @param aktienname
+     * @throws SQLException
+     */
+    public static void kurs_select(Connection conn, String aktienname) throws SQLException{
+        ArrayList<String> liste  = new ArrayList<>();
+
+        String query = "SELECT kurs.ISIN, Datum,Kurs, Waehrung, letztesUpdate \n" +
+                "FROM kurs JOIN aktie ON kurs.ISIN = aktie.ISIN\n" +
+                "WHERE aktienname = '" + aktienname + "'";
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+        int i = 1;
+        while (rs.next()){
+            //Alle Selects ausgeben...
+            System.out.println("ISIN: " + rs.getString("kurs.ISIN"));
+            System.out.println("Datum: " + rs.getString("Datum"));
+            System.out.println("Kurs: " + rs.getString("Kurs"));
+            System.out.println("Währung: " + rs.getString("Waehrung"));
+            System.out.println("letztes Update: " + rs.getString("letztesUpdate"));
+            System.out.println("\n");
+        }
+
 
     }
 
 
-    public void bilanz_select(){
+    /**
+     * Select Statement für die Bilanz, bei bekanntem Aktienname
+     * @author Lukas Meinzer
+     * @param conn
+     * @param aktienname
+     * @throws SQLException
+     */
+    public static void bilanz_select(Connection conn, String aktienname) throws SQLException{
+        ArrayList<String> liste  = new ArrayList<>();
+
+        String query = "SELECT bilanz.ISIN, Jahr,Umsatz, Gewinn, EBIT, Eigenkapital, Fremdkapital, Waehrung, letztesUpdate \n" +
+                "FROM bilanz JOIN aktie ON bilanz.ISIN = aktie.ISIN\n" +
+                "WHERE aktienname = '" + aktienname + "'";
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+        int i = 1;
+        while (rs.next()){
+            //Alle Selects ausgeben...
+            System.out.println("ISIN: " + rs.getString("bilanz.ISIN"));
+            System.out.println("Jahr: " + rs.getString("Jahr"));
+            System.out.println("Umsatz: " + rs.getString("Umsatz"));
+            System.out.println("Gewinn: " + rs.getString("Gewinn"));
+            System.out.println("EBIT: " + rs.getString("EBIT"));
+            System.out.println("Eigenkapital: " + rs.getString("Eigenkapital"));
+            System.out.println("Fremdkapital: " + rs.getString("Fremdkapital"));
+            System.out.println("Waehrung: " + rs.getString("Waehrung"));
+            System.out.println("letztes Update: " + rs.getString("letztesUpdate"));
+            System.out.println("\n");
+        }
+
 
     }
 
