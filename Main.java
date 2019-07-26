@@ -79,13 +79,20 @@ public class Main {
             }
         }
 
-
 //________________________________________________________________________________________
 //___________________USER ABFRAGE ROHFASSUNG_______________________________________________
 
 
-            File dir = new File("C:\\Users\\Luke the Duke\\Desktop\\Java\\Programme\\Studienprojekt_Ariva_neu\\CSV-Daten");
+        /**
+         * Hier muesste noch eine Abfrage bzw. Prüfung hin, ob die entsprechenden Daten bereits gedownloaded worden sind
+         */
+
+
+
+
+        File dir = new File("C:\\Users\\Luke the Duke\\Desktop\\Java\\Programme\\Studienprojekt_Ariva_neu\\CSV-Daten");
                 //Alle Dateien in dem genannten Pfad auflisten lassen
+        // Achtung!! Hier muss natürlich jeder seinen eigenen Pfad hernehmen
             File[] files = dir.listFiles();
             //String den wir für die Abfrage getName brauchen:
             String temp;
@@ -105,6 +112,79 @@ public class Main {
             auswahl = scan2.next();
 
 
+
+
+            boolean auswahlverfuegbar = false;
+            if(auswahl != null){
+                //Überprüfe ob auswahl überhaupt in der angezeigten Aktienliste vorkommt
+                String isinalsString;
+                String isinToName;
+
+                for (int i = 0; i < files.length; i++) {
+                    //Substring um ".csv" am Ende wegzuschneiden
+                    isinalsString = files[i].getName().substring(0,12);
+                    isinToName = dbop.getName(conn,isinalsString);
+                    if(auswahl.equals(isinToName)){
+                           auswahlverfuegbar = true;
+                    }
+                }
+                if(!auswahlverfuegbar){
+                    System.out.println("Falsche Eingabe.");
+                    System.exit(10);
+                }
+            }
+            else{
+                System.err.println("ungültige Eingabe.");
+            }
+
+            if(auswahlverfuegbar){
+                //der Nutzer hat eine gültige Auswahl getroffen
+                System.out.println("Was möchtest du dir anzeigen lassen?");
+                System.out.println("Kurs            -> 1");
+                System.out.println("Bilanz          -> 2");
+                System.out.println("Kurs & Bilanz   -> 3");
+
+                //___________Kurs funktioniert!______________
+
+                Scanner scan = new Scanner(System.in);
+                int j = scan.nextInt();
+
+                if(j==1){
+                    try{
+                        DBOperations.kurs_select(conn,auswahl);
+                    } catch(SQLException e){
+                        System.err.println(e);
+                    }
+                }
+                if(j==2){
+                    try{
+                        DBOperations.bilanz_select(conn,auswahl);
+                    } catch(SQLException e){
+                        System.err.println(e);
+                    }
+                }
+                if(j==3){
+                    System.out.println("KURS:\n\n");
+                    try{
+                        DBOperations.kurs_select(conn,auswahl);
+                    } catch(SQLException e){
+                        System.err.println(e);
+                    }
+                    System.out.println("\n\n");
+                    System.out.println("BILANZ:\n\n");
+                    try{
+                        DBOperations.bilanz_select(conn,auswahl);
+                    } catch(SQLException e){
+                        System.err.println(e);
+                    }
+
+                }
+                if(j!=1 && j!=2 && j!=3){
+                    System.err.println("ungültige Eingabe.");
+                }
+            }
+
+        System.exit(100);
 //_________________________________________________________________________________________
 //_________________________________________________________________________________________
         
