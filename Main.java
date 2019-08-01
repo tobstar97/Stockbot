@@ -204,6 +204,7 @@ public class Main {
             }else{
                 Steuerung st = new Steuerung();
                 try {
+                    System.out.println("\n\n\nAchtung! Das Herunterladen der Daten wird einige Zeit in Anspruch nehmen.\nSobald es fertg ist, starte das Programm erneut.\n\n\n");
                     st.feeder();
                 }catch (Exception e){
                     e.printStackTrace();
@@ -216,12 +217,14 @@ public class Main {
             String aktienlink = scan.next();
 
             try {
+                System.out.println("\n\n\nAchtung! Das Herunterladen der Daten wird einige Zeit in Anspruch nehmen.\nSobald es fertg ist, starte das Programm erneut.\n\n\n");
                 //acsv.kurs_csv_link(aktienlink);
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }else if(i == 3){
+            System.out.println("\n\n\nAchtung! Das Herunterladen der Daten wird einige Zeit in Anspruch nehmen.\nSobald es fertg ist, starte das Programm erneut.\n\n\n");
             aktienliste();
         }
         else {
