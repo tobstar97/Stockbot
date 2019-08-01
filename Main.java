@@ -84,110 +84,125 @@ public class Main {
 
 
         /**
-         * Hier muesste noch eine Abfrage bzw. Prüfung hin, ob die entsprechenden Daten bereits gedownloaded worden sind
+         *  Abfrage bzw. Prüfung, ob die entsprechenden Daten bereits gedownloaded worden sind:
+         *  Aber Achtung: Das ist noch eine sehr schlechte Lösung. Wenn der User angibt dass er die Daten bereits gedownloaded hat, 
+         *  er es aber nicht getan hat, werden Errors auftauchen. Hier muss ich noch eine bessere Lösung finden.
          */
 
+        boolean datenvorhanden = false;
+
+        String temporaer;
+        System.out.println("Haben Sie die gewünschten Daten bereits runtergeladen?\nGeben sie entweder 'Ja' oder 'Nein' ein.");
+        Scanner janein = new Scanner(System.in);
+        temporaer = janein.next();
+        switch(temporaer){
+            case "Ja": datenvorhanden = true; break;
+            case "ja": datenvorhanden = true; break;
+            default: datenvorhanden = false; break;
+        }
 
 
 
-        File dir = new File("C:\\Users\\Luke the Duke\\Desktop\\Java\\Programme\\Studienprojekt_Ariva_neu\\CSV-Daten");
-                //Alle Dateien in dem genannten Pfad auflisten lassen
-        // Achtung!! Hier muss natürlich jeder seinen eigenen Pfad hernehmen
-            File[] files = dir.listFiles();
-            //String den wir für die Abfrage getName brauchen:
-            String temp;
-            if (files != null) { // Erforderliche Berechtigungen etc. sind vorhanden
-                for (int i = 0; i < files.length; i++) {
-                    //Substring um ".csv" am Ende wegzuschneiden
-                    temp = files[i].getName().substring(0,12);
-                    //Printe die ISIN und den Namen
-                    System.out.println(temp + "\t" + dbop.getName(conn,temp));
-                }
-            }
-
-            System.out.println("\n");
-            String auswahl;
-            System.out.println("Gib den Namen der Aktie ein, die du dir ansehen möchtest.");
-            Scanner scan2 = new Scanner(System.in);
-            auswahl = scan2.next();
-
-
-
-
-            boolean auswahlverfuegbar = false;
-            if(auswahl != null){
-                //Überprüfe ob auswahl überhaupt in der angezeigten Aktienliste vorkommt
-                String isinalsString;
-                String isinToName;
-
-                for (int i = 0; i < files.length; i++) {
-                    //Substring um ".csv" am Ende wegzuschneiden
-                    isinalsString = files[i].getName().substring(0,12);
-                    isinToName = dbop.getName(conn,isinalsString);
-                    if(auswahl.equals(isinToName)){
-                           auswahlverfuegbar = true;
+        while(datenvorhanden){
+            
+            File dir = new File("C:\\Users\\Luke the Duke\\Desktop\\Java\\Programme\\Studienprojekt_Ariva_neu\\CSV-Daten");
+                    //Alle Dateien in dem genannten Pfad auflisten lassen
+            // Achtung!! Hier muss natürlich jeder seinen eigenen Pfad hernehmen
+                File[] files = dir.listFiles();
+                //String den wir für die Abfrage getName brauchen:
+                String temp;
+                if (files != null) { // Erforderliche Berechtigungen etc. sind vorhanden
+                    for (int i = 0; i < files.length; i++) {
+                        //Substring um ".csv" am Ende wegzuschneiden
+                        temp = files[i].getName().substring(0,12);
+                        //Printe die ISIN und den Namen
+                        System.out.println(temp + "\t" + dbop.getName(conn,temp));
                     }
                 }
-                if(!auswahlverfuegbar){
-                    System.out.println("Falsche Eingabe.");
-                    System.exit(10);
-                }
-            }
-            else{
-                System.err.println("ungültige Eingabe.");
-            }
 
-            if(auswahlverfuegbar){
-                //der Nutzer hat eine gültige Auswahl getroffen
-                System.out.println("Was möchtest du dir anzeigen lassen?");
-                System.out.println("Kurs            -> 1");
-                System.out.println("Bilanz          -> 2");
-                System.out.println("Kurs & Bilanz   -> 3");
+                System.out.println("\n");
+                String auswahl;
+                System.out.println("Gib den Namen der Aktie ein, die du dir ansehen möchtest.");
+                Scanner scan2 = new Scanner(System.in);
+                auswahl = scan2.next();
 
-                //___________Kurs funktioniert!______________
 
-                Scanner scan = new Scanner(System.in);
-                int j = scan.nextInt();
 
-                if(j==1){
-                    try{
-                        DBOperations.kurs_select(conn,auswahl);
-                    } catch(SQLException e){
-                        System.err.println(e);
+
+                boolean auswahlverfuegbar = false;
+                if(auswahl != null){
+                    //Überprüfe ob auswahl überhaupt in der angezeigten Aktienliste vorkommt
+                    String isinalsString;
+                    String isinToName;
+
+                    for (int i = 0; i < files.length; i++) {
+                        //Substring um ".csv" am Ende wegzuschneiden
+                        isinalsString = files[i].getName().substring(0,12);
+                        isinToName = dbop.getName(conn,isinalsString);
+                        if(auswahl.equals(isinToName)){
+                               auswahlverfuegbar = true;
+                        }
+                    }
+                    if(!auswahlverfuegbar){
+                        System.out.println("Falsche Eingabe.");
+                        System.exit(10);
                     }
                 }
-                if(j==2){
-                    try{
-                        DBOperations.bilanz_select(conn,auswahl);
-                    } catch(SQLException e){
-                        System.err.println(e);
-                    }
-                }
-                if(j==3){
-                    System.out.println("KURS:\n\n");
-                    try{
-                        DBOperations.kurs_select(conn,auswahl);
-                    } catch(SQLException e){
-                        System.err.println(e);
-                    }
-                    System.out.println("\n\n");
-                    System.out.println("BILANZ:\n\n");
-                    try{
-                        DBOperations.bilanz_select(conn,auswahl);
-                    } catch(SQLException e){
-                        System.err.println(e);
-                    }
-
-                }
-                if(j!=1 && j!=2 && j!=3){
+                else{
                     System.err.println("ungültige Eingabe.");
                 }
-            }
+
+                if(auswahlverfuegbar){
+                    //der Nutzer hat eine gültige Auswahl getroffen
+                    System.out.println("Was möchtest du dir anzeigen lassen?");
+                    System.out.println("Kurs            -> 1");
+                    System.out.println("Bilanz          -> 2");
+                    System.out.println("Kurs & Bilanz   -> 3");
+
+                    //___________Kurs funktioniert!______________
+
+                    Scanner scan = new Scanner(System.in);
+                    int j = scan.nextInt();
+
+                    if(j==1){
+                        try{
+                            DBOperations.kurs_select(conn,auswahl);
+                        } catch(SQLException e){
+                            System.err.println(e);
+                        }
+                    }
+                    if(j==2){
+                        try{
+                            DBOperations.bilanz_select(conn,auswahl);
+                        } catch(SQLException e){
+                            System.err.println(e);
+                        }
+                    }
+                    if(j==3){
+                        System.out.println("KURS:\n\n");
+                        try{
+                            DBOperations.kurs_select(conn,auswahl);
+                        } catch(SQLException e){
+                            System.err.println(e);
+                        }
+                        System.out.println("\n\n");
+                        System.out.println("BILANZ:\n\n");
+                        try{
+                            DBOperations.bilanz_select(conn,auswahl);
+                        } catch(SQLException e){
+                            System.err.println(e);
+                        }
+
+                    }
+                    if(j!=1 && j!=2 && j!=3){
+                        System.err.println("ungültige Eingabe.");
+                    }
+                }
 
         System.exit(100);
 //_________________________________________________________________________________________
 //_________________________________________________________________________________________
-        
+        } //Hier ist die while-Schleife vorbei
         
 
         System.out.println("Download der CSV-Daten aller Aktien auf ariva.de?       -> 1");
