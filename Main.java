@@ -239,7 +239,7 @@ public class Main {
                 e.printStackTrace();
             }
         }else if(i == 3){
-            System.out.println("\n\n\nAchtung! Das Herunterladen der Daten wird einige Zeit in Anspruch nehmen.\nSobald es fertg ist, starte das Programm erneut.\n\n\n");
+            System.out.println("\n\n\nAchtung! Das Herunterladen der Daten wird einige Zeit in Anspruch nehmen.\nSobald es fertg ist, starte das Programm erneut.\nStellen Sie außerdem sicher, dass Sie während des gesamten Downloads eine stabile Internetverbindung haben.\n\n\n");
             aktienliste();
         }
         else {
